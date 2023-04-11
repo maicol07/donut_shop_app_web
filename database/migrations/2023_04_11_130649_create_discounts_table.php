@@ -7,18 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('supplies', static function (Blueprint $table) {
+        Schema::create('discounts', static function (Blueprint $table) {
             $table->id();
+            $table->string('discount_name');
             $table->dateTime('start_date');
             $table->dateTime('end_date');
-            $table->string("company_vat_number");
-            $table->foreign("company_vat_number")->references("vat_number")->on("companies");
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('supplies');
+        Schema::dropIfExists('discounts');
     }
 };
