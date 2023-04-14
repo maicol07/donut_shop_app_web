@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OnlineSale extends Model
 {
@@ -10,4 +11,16 @@ class OnlineSale extends Model
         'type',
         'username',
     ];
+
+    protected $primaryKey = 'order_number';
+
+    final public function account(): BelongsTo
+    {
+        return $this->belongsTo(Account::class, 'username');
+    }
+
+    final public function sale(): BelongsTo
+    {
+        return $this->belongsTo(Sale::class);
+    }
 }

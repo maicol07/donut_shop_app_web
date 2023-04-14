@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Supply extends Model
 {
@@ -16,4 +18,18 @@ class Supply extends Model
         'start_date' => 'datetime',
         'end_date' => 'datetime',
     ];
+
+    // Company
+    final public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'company_vat_number', 'vat_number');
+    }
+
+    // Daily reservation
+    final public function dailyReservations(): BelongsToMany
+    {
+        return $this->belongsToMany(Donut::class, 'daily_reservations', 'supply_id', 'donut_id')
+            ->withPivot('quantity')
+            ->withTimestamps();
+    }
 }
