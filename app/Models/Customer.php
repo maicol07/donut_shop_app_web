@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Customer extends Model
 {
@@ -23,4 +24,10 @@ class Customer extends Model
     protected $casts = [
         'birth_date' => 'datetime',
     ];
+    protected $primaryKey = 'fiscal_code';
+
+    final public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, "vat_number");
+    }
 }

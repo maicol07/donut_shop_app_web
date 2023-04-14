@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Account extends Model
 {
@@ -11,4 +12,12 @@ class Account extends Model
         'fiscal_code',
         'password',
     ];
+
+    protected $primaryKey = "username";
+    protected $keyType = 'string';
+
+    final public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, "fiscal_code");
+    }
 }
