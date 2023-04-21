@@ -3,6 +3,8 @@
 namespace App\Restify;
 
 use App\Models\Company;
+use Binaryk\LaravelRestify\Fields\HasMany;
+use Binaryk\LaravelRestify\Fields\HasOne;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class CompanyRepository extends Repository
@@ -18,6 +20,14 @@ class CompanyRepository extends Repository
             field('vat_number')->required()->rules('string')->storingRules('unique:companies,vat_number'),
             field("created_at")->readonly(),
             field("updated_at")->readonly(),
+        ];
+    }
+
+    public static function related(): array
+    {
+        return [
+            HasMany::make('supplies'),
+            HasMany::make('customer')
         ];
     }
 }
