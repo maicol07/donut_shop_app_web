@@ -24,22 +24,22 @@ class ShopRepository extends Repository
     {
         return [
             BelongsToMany::make('employees', EmployeeRepository::class)->withPivot(
-                field("fiscal_code"),
-                field("created_at"),
-                field("updated_at"),
+                field("fiscal_code")->required()->rules('string'),
+                field("created_at")->readonly(),
+                field("updated_at")->readonly(),
             ),
             BelongsToMany::make('contracts', ContractRepository::class)->withPivot(
-                field("created_at"),
-                field("updated_at"),
+                field("created_at")->readonly(),
+                field("updated_at")->readonly(),
             ),
             BelongsToMany::make('availabilities', DonutRepository::class)->withPivot(
-                field("quantity"),
-                field("created_at"),
-                field("updated_at"),
+                field("quantity")->required()->rules('numeric'),
+                field("created_at")->readonly(),
+                field("updated_at")->readonly(),
             ),
             BelongsToMany::make('warehouses', WarehouseRepository::class)->withPivot(
-                field("created_at"),
-                field("updated_at"),
+                field("created_at")->readonly(),
+                field("updated_at")->readonly(),
             ),
         ];
     }
