@@ -1,0 +1,14 @@
+{
+    "$schema": "ide.schema.json",
+    "completions": [
+        {
+            "complete": "validationRule",
+            "condition": [
+                {
+                    "methodNames": ["rules"],
+                    "classFqn": ["\\Binaryk\\LaravelRestify\\Fields\\Field"]
+                }
+            ]
+        }
+    ]
+}
