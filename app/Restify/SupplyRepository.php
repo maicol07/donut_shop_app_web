@@ -27,9 +27,9 @@ class SupplyRepository extends Repository
         return [
             BelongsTo::make('company', CompanyRepository::class),
             BelongsToMany::make('dailyReservation', DonutRepository::class)->withPivot(
-                field("quantity"),
-                field("created_at"),
-                field("updated_at"),
+                field("quantity")->required()->rules('numeric'),
+                field("created_at")->readonly(),
+                field("updated_at")->readonly(),
             ),
         ];
     }
