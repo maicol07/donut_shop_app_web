@@ -5,7 +5,7 @@
             "complete": "validationRule",
             "condition": [
                 {
-                    "methodNames": ["rules"],
+                    "methodNames": ["rules", "storingRules", "updatingRules"],
                     "classFqn": ["\\Binaryk\\LaravelRestify\\Fields\\Field"]
                 }
             ]
