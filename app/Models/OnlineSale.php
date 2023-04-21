@@ -12,8 +12,6 @@ class OnlineSale extends Model
         'username',
     ];
 
-    protected $primaryKey = 'order_number';
-
     final public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class, 'username');
