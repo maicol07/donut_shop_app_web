@@ -3,6 +3,7 @@
 namespace App\Restify;
 
 use App\Models\Customer;
+use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class CustomerRepository extends Repository
@@ -27,6 +28,13 @@ class CustomerRepository extends Repository
             field('email')->required()->rules('email'),
             field("created_at")->readonly(),
             field("updated_at")->readonly()
+        ];
+    }
+
+    public static function related(): array
+    {
+        return [
+            BelongsTo::make('company')
         ];
     }
 }

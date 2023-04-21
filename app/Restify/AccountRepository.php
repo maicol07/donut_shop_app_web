@@ -3,6 +3,7 @@
 namespace App\Restify;
 
 use App\Models\Account;
+use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class AccountRepository extends Repository
@@ -20,6 +21,13 @@ class AccountRepository extends Repository
             field('password')->required()->rules('string', 'min:8'),
             field("created_at")->readonly(),
             field("updated_at")->readonly(),
+        ];
+    }
+
+    public static function related(): array
+    {
+        return [
+            BelongsTo::make('customer')
         ];
     }
 }

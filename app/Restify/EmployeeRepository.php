@@ -3,6 +3,7 @@
 namespace App\Restify;
 
 use App\Models\Employee;
+use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class EmployeeRepository extends Repository
@@ -28,6 +29,17 @@ class EmployeeRepository extends Repository
             field('province')->required()->rules('string'),
             field('created_at')->readonly(),
             field('updated_at')->readonly(),
+        ];
+    }
+
+    public static function related(): array
+    {
+        return [
+            BelongsToMany::make('contracts')->withPivot(
+                field('created_at')->readonly(),
+                field('updated_at')->readonly()
+            ),
+            BelongsToMany::make('shops')
         ];
     }
 }

@@ -25,7 +25,16 @@ class IngredientRepository extends Repository
     public static function related(): array
     {
         return [
-           //BelongsToMany::make('users', UserRepository::class),
+            BelongsToMany::make('donuts')->withPivot(
+                field('absolute_quantity')->required()->rules('numeric'),
+                field('created_at')->readonly(),
+                field('updated_at')->readonly(),
+            ),
+            BelongsToMany::make('warehouses')->withPivot(
+                field('quantity')->required()->rules('numeric'),
+                field('created_at')->readonly(),
+                field('updated_at')->readonly(),
+            ),
         ];
     }
 }
