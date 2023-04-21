@@ -12,6 +12,10 @@ class Ingredient extends Model
         'allergen',
     ];
 
+    protected $casts = [
+        "allergen" => "bool",
+    ];
+
     final public function donuts(): BelongsToMany
     {
         return $this->belongsToMany(Donut::class, "compositions")
