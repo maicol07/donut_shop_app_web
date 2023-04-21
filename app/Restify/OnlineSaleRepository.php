@@ -3,6 +3,7 @@
 namespace App\Restify;
 
 use App\Models\OnlineSale;
+use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class OnlineSaleRepository extends Repository
@@ -24,7 +25,8 @@ class OnlineSaleRepository extends Repository
     public static function related(): array
     {
         return [
-            //BelongsToMany::make('users', UserRepository::class),
+            BelongsTo::make("account", AccountRepository::class),
+            BelongsTo::make("sale", SaleRepository::class)
         ];
     }
 }

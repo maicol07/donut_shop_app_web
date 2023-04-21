@@ -3,6 +3,8 @@
 namespace App\Restify;
 
 use App\Models\Supply;
+use Binaryk\LaravelRestify\Fields\BelongsTo;
+use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class SupplyRepository extends Repository
@@ -23,7 +25,12 @@ class SupplyRepository extends Repository
     public static function related(): array
     {
         return [
-            //BelongsToMany::make('users', UserRepository::class),
+            BelongsTo::make('company', CompanyRepository::class),
+            BelongsToMany::make('dailyReservation', DonutRepository::class)->withPivot(
+                field("quantity"),
+                field("created_at"),
+                field("updated_at"),
+            ),
         ];
     }
 }

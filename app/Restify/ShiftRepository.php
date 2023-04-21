@@ -3,6 +3,7 @@
 namespace App\Restify;
 
 use App\Models\Shift;
+use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class ShiftRepository extends Repository
@@ -24,7 +25,7 @@ class ShiftRepository extends Repository
     public static function related(): array
     {
         return [
-            //BelongsToMany::make('users', UserRepository::class),
+            BelongsTo::make('contract', ContractRepository::class),
         ];
     }
 }

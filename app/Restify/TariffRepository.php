@@ -3,6 +3,7 @@
 namespace App\Restify;
 
 use App\Models\Tariff;
+use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class TariffRepository extends Repository
@@ -23,7 +24,8 @@ class TariffRepository extends Repository
     public static function related(): array
     {
         return [
-            //BelongsToMany::make('users', UserRepository::class),
+            BelongsTo::make('donut', DonutRepository::class),
+            BelongsTo::make('discount', DiscountRepository::class),
         ];
     }
 }

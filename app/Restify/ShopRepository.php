@@ -3,6 +3,7 @@
 namespace App\Restify;
 
 use App\Models\Shop;
+use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class ShopRepository extends Repository
@@ -22,7 +23,24 @@ class ShopRepository extends Repository
     public static function related(): array
     {
         return [
-            //BelongsToMany::make('users', UserRepository::class),
+            BelongsToMany::make('employees', EmployeeRepository::class)->withPivot(
+                field("fiscal_code"),
+                field("created_at"),
+                field("updated_at"),
+            ),
+            BelongsToMany::make('contracts', ContractRepository::class)->withPivot(
+                field("created_at"),
+                field("updated_at"),
+            ),
+            BelongsToMany::make('availabilities', DonutRepository::class)->withPivot(
+                field("quantity"),
+                field("created_at"),
+                field("updated_at"),
+            ),
+            BelongsToMany::make('warehouses', WarehouseRepository::class)->withPivot(
+                field("created_at"),
+                field("updated_at"),
+            ),
         ];
     }
 }

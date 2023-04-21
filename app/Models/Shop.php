@@ -20,7 +20,7 @@ class Shop extends Model
     // TODO: Check this
     final public function contracts(): BelongsToMany
     {
-        return $this->belongsToMany(Contract::class, 'employee_assignments')->withPivot(['start_date', 'end_date'])->withTimestamps();
+        return $this->belongsToMany(Contract::class, 'employee_assignments')->withTimestamps();
     }
 
     // Availabilities
@@ -30,8 +30,8 @@ class Shop extends Model
     }
 
     // Warehouse
-    final public function warehouse(): BelongsToMany
+    final public function warehouses(): BelongsToMany
     {
-        return $this->belongsToMany(Warehouse::class, 'stocks')->withPivot(['quantity'])->withTimestamps();
+        return $this->belongsToMany(Warehouse::class, 'stocks')->withTimestamps();
     }
 }

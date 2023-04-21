@@ -21,8 +21,8 @@ class Company extends Model
         return $this->hasMany(Supply::class, "company_vat_number");
     }
 
-    final public function customer(): HasOne
+    final public function customer(): HasMany
     {
-        return $this->hasOne(Customer::class, "company_vat_number");
+        return $this->hasMany(Customer::class, "company_vat_number");
     }
 }

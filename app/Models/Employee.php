@@ -30,7 +30,6 @@ class Employee extends Model
     final public function contracts(): BelongsToMany
     {
         return $this->belongsToMany(Contract::class, "employee_assignments")
-            ->withPivot("quantity", "percentage_discount")
             ->withTimestamps();
     }
 
