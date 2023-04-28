@@ -1,5 +1,5 @@
 import '../m3/NavigationDrawer';
-import '../m3/List';
+import '@material/web/list/list.js';
 
 import {
   mdiAccountGroupOutline,

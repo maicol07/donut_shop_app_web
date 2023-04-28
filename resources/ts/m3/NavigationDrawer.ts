@@ -4,6 +4,12 @@ import {styles as sharedStyles} from '@material/web/navigationdrawer/lib/shared-
 import {css} from 'lit';
 import {customElement} from 'lit/decorators.js';
 
+declare global {
+    interface HTMLElementTagNameMap {
+        'md-navigation-drawer': MdNavigationDrawer;
+    }
+}
+
 @customElement('md-navigation-drawer')
 export default class MdNavigationDrawer extends MDNavigationDrawer {
   static override readonly styles = [sharedStyles, styles, css`
@@ -20,13 +26,4 @@ export default class MdNavigationDrawer extends MDNavigationDrawer {
       width: inherit;
     }
   `];
-
-  // @ts-expect-error - Workaround for https://github.com/material-components/material-web/issues/3804
-  // eslint-disable-next-line unicorn/no-null
-  override ariaModal: 'true' | 'false' | null = null;
-
-  connectedCallback() {
-    super.connectedCallback();
-    this.ariaModal = 'false';
-  }
 }

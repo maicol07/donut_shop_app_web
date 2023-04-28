@@ -1,6 +1,6 @@
-import '../m3/ListItemLink';
-import '@material/web/icon/icon.js';
+import '@material/web/list/list-item-link.js';
 
+import '@material/web/icon/icon.js';
 import {router} from '@maicol07/inertia-mithril';
 import {ListItemLink} from '@material/web/list/lib/listitemlink/list-item-link';
 import MaterialIcons from '@mdi/js';
