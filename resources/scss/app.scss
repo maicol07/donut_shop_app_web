@@ -1,12 +1,35 @@
+@import 'modern-normalize/modern-normalize.css';
+@import "theme/theme.css";
+
+$headlines-font-family: 'Kanit';
+$body-font-family: 'Kantumruy Pro';
+
+:root {
+    --md-ref-typeface-brand: #{$headlines-font-family};
+    --md-ref-typeface-plain: #{$body-font-family};
+}
+
+body {
+    font-family: #{$body-font-family};
+
+    background-color: var(--md-sys-color-background, #fff);
+    color: var(--md-sys-color-on-background);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: #{$headlines-font-family};
+}
+
 md-navigation-drawer, md-navigation-drawer-modal {
     //--mdc-theme-surface: var(--md-sys-color-background, #fff);
     //--mdc-theme-primary: var(--mdc-theme-primary2, variables.$primary);
 
     //noinspection Stylelint
     > md-list md-list-item-link {
+        margin-left: 16px;
         display: block;
         width: 85%;
-        --md-list-list-item-container-shape: 100px;
+        --md-list-item-list-item-container-shape: 100px;
         --md-ripple-shape: 100px;
         //--md-focus-ring-shape-start-start: 100px;
         //--md-focus-ring-shape-start-end: 100px;
@@ -14,10 +37,12 @@ md-navigation-drawer, md-navigation-drawer-modal {
         //--md-focus-ring-shape-end-end: 100px;
 
         &[active] {
-            --md-list-list-item-container-color: var(--md-sys-color-secondary-container, #3f51b5);
+            --md-list-item-list-item-container-color: var(--md-sys-color-primary-container, #EADDFF);
         }
     }
+
 }
+
 
 md-icon svg {
     width: var(--_with-icon-icon-size, var(--_icon-size, var(--_size)));
