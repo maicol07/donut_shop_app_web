@@ -44,9 +44,9 @@ export default abstract class Page<A extends PageAttributes = PageAttributes> ex
 
     wrapContents(vnode: Vnode<A>, contents: Children): Children {
         return (
-            <div style={{display: 'flex'}}>
+            <div style={{display: 'flex', gap: '16px'}}>
                 <Drawer/>
-                <main id="appContent">
+                <main id="appContent" style={{marginTop: '16px'}}>
                     {contents}
                 </main>
             </div>
