@@ -25,6 +25,8 @@
         "mithril": "^2.2.2",
         "mithril-utilities": "^1.1.1",
         "modern-normalize": "^1.1.0",
+        "ts-pattern": "^4.2.2",
+        "type-fest": "^3.9.0",
         "ziggy-js": "^1.5.1"
     }
 }

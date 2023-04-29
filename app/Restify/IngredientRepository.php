@@ -17,8 +17,8 @@ class IngredientRepository extends Repository
         return [
             field('name')->required(),
             field('allergen')->required()->rules("boolean"),
-            field("created_at")->readonly(),
-            field("updated_at")->readonly()
+            field("created_at")->label('createdAt')->readonly(),
+            field("updated_at")->label('updatedAt')->readonly()
         ];
     }
 
