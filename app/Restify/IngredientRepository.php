@@ -14,8 +14,8 @@ class IngredientRepository extends Repository
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('name')->required(),
-            field('allergen')->required()->rules("boolean"),
+            field("name")->required(),
+            field("allergen")->required()->rules("boolean"),
             field("created_at")->label('createdAt')->readonly(),
             field("updated_at")->label('updatedAt')->readonly()
         ];
