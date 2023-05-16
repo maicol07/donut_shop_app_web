@@ -6,7 +6,7 @@ import {ListItemLink} from '@material/web/list/lib/listitemlink/list-item-link';
 import MaterialIcons from '@mdi/js';
 import {Vnode} from 'mithril';
 
-import MdIcon from '~/MdIcon';
+import MdIcon from '~/Components/MdIcon';
 import {Attributes, Component} from 'mithril-utilities';
 import route from 'ziggy-js';
 

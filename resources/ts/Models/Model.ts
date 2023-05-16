@@ -27,6 +27,9 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
   protected static jsonApiBaseUrl = '/api';
   protected static httpClient = new RequestHttpClient();
 
+  abstract attributesNames: (keyof A)[];
+  __relations!: (keyof R)[];
+
   static dates = {
     createdAt: 'YYYY-MM-DDTHH:mm:ss.ssssssZ',
     updatedAt: 'YYYY-MM-DDTHH:mm:ss.ssssssZ'

@@ -13,4 +13,5 @@ export interface IngredientRelations extends ModelRelations {
 }
 
 export default class Ingredient extends Model<IngredientAttributes, IngredientRelations> {
+  attributesNames = ['name', 'allergen'];
 }

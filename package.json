@@ -7,26 +7,27 @@
     "devDependencies": {
         "@types/mithril": "^2.0.12",
         "@types/ziggy-js": "^1.3.2",
-        "axios": "^1.3.6",
+        "axios": "^1.4.0",
         "csstype": "^3.1.2",
         "laravel-vite-plugin": "^0.7.4",
-        "sass": "^1.62.0",
+        "sass": "^1.62.1",
         "typescript": "^5.0.4",
-        "vite": "^4.3.2"
+        "vite": "^4.3.5"
     },
     "dependencies": {
         "@maicol07/inertia-mithril": "^1.0.3",
-        "@maicol07/material-web-additions": "^1.2.11",
+        "@maicol07/material-web-additions": "^1.2.13",
+        "@material/mwc-snackbar": "^0.27.0",
         "@material/web": "1.0.0-pre.7",
         "@mdi/js": "^7.2.96",
         "collect.js": "^4.36.1",
         "coloquent": "3.0.1-beta",
-        "lit": "^2.7.2",
+        "lit": "^2.7.4",
         "mithril": "^2.2.2",
-        "mithril-utilities": "^1.1.1",
+        "mithril-utilities": "^1.1.2",
         "modern-normalize": "^1.1.0",
-        "ts-pattern": "^4.2.2",
-        "type-fest": "^3.9.0",
-        "ziggy-js": "^1.5.1"
+        "ts-pattern": "^4.2.3",
+        "type-fest": "^3.10.0",
+        "ziggy-js": "^1.5.2"
     }
 }
