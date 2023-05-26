@@ -16,8 +16,8 @@ class DonutRepository extends Repository
             field('name')->required()->rules('string'),
             field('price')->required()->rules('numeric'),
             field('description')->required()->rules('string'),
-            field('created_at')->readonly(),
-            field('updated_at')->readonly(),
+            field('created_at')->label('createdAt')->readonly(),
+            field('updated_at')->label('updatedAt')->readonly(),
         ];
     }
 
