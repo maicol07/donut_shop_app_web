@@ -9,10 +9,7 @@ import Stream from 'mithril/stream';
 import '@material/web/chips/filter-chip.js';
 import '@material/web/textfield/filled-text-field.js';
 import '@material/web/checkbox/checkbox.js';
-import {Checkbox} from '@material/web/checkbox/lib/checkbox';
 import DataTableColumn from '~/Components/DataTableColumn';
-import {mdiAlert, mdiAlertOutline, mdiExclamation, mdiPeanutOutline, mdiPlus} from '@mdi/js';
-import MdIcon from '~/Components/MdIcon';
 import {FormSubmitEvent} from 'mithril-utilities/dist/Form';
 import {DataTable} from '@maicol07/material-web-additions/data-table/lib/data-table';
 
