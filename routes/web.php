@@ -15,3 +15,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Home')->name("home");
 Route::inertia('ingredients', 'Ingredients')->name("ingredients");
+Route::inertia('donuts', 'Donuts')->name("donuts");

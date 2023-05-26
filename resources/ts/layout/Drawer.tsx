@@ -2,6 +2,7 @@ import '../m3/NavigationDrawer';
 import '@material/web/list/list.js';
 
 import {
+  mdiCupcake,
   mdiEggOutline,
   mdiViewDashboardOutline
 } from '@mdi/js';
@@ -30,6 +31,7 @@ export default class Drawer<A extends DrawerAttributes = DrawerAttributes> exten
         <>
             <DrawerEntry route="home" icon={mdiViewDashboardOutline}>Home</DrawerEntry>
           <DrawerEntry route="ingredients" icon={mdiEggOutline}>Ingredients</DrawerEntry>
+          <DrawerEntry route="donuts" icon={mdiCupcake}>Donuts</DrawerEntry>
         </>
     );
   }
