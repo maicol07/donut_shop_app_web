@@ -14,7 +14,7 @@ import DataTableColumn from '~/Components/DataTableColumn';
 import {mdiAlert, mdiAlertOutline, mdiExclamation, mdiPeanutOutline, mdiPlus} from '@mdi/js';
 import MdIcon from '~/Components/MdIcon';
 import {FormSubmitEvent} from 'mithril-utilities/dist/Form';
-import {FilterChip} from '@material/web/chips/lib/filter-chip';
+import {DataTable} from '@maicol07/material-web-additions/data-table/lib/data-table';
 
 
 export default class Donuts extends RecordsPage<Donut> {
@@ -39,7 +39,7 @@ export default class Donuts extends RecordsPage<Donut> {
 
   attributeMap(name: keyof DonutAttributes, value: ValueOf<DonutAttributes>) {
     return match(name)
-      .with("allergen", () => value ? 'Yes' : 'No')
+      .with("allergen", () => value ? 'Yes' : 'No')//is this needed?
       .otherwise(() => super.attributeMap(name, value));
   }
 
@@ -57,11 +57,22 @@ export default class Donuts extends RecordsPage<Donut> {
         <md-filled-text-field name="description" label="Description" errorText={this.errors.description?.[0]} error={'description' in this.errors}/>
         <h3 className="headline-small">Ingredients</h3>
         <div style={{display: 'flex', flexWrap: 'wrap', gap: '16px'}}>
-          {this.ingredients.map((ingredient) => (
-            <md-filter-chip data-relation="ingredient" data-record-id={ingredient.getId()} label={ingredient.getAttribute('name')}>
-              {ingredient.getAttribute('allergen') && <MdIcon slot="icon" icon={mdiAlertOutline}/>}
-            </md-filter-chip>
-          ))}
+          <md-data-table>
+            <DataTableColumn type="checkbox"></DataTableColumn>
+            <DataTableColumn filterable sortable>Ingredient</DataTableColumn>
+            <DataTableColumn>Quantity</DataTableColumn>
+            {this.ingredients.map((ingredient) => (
+              <md-data-table-row data-relation="ingredient" data-record-id={ingredient.getId()}>
+                <md-data-table-cell type="checkbox"></md-data-table-cell>
+                <md-data-table-cell>
+                  {ingredient.getAttribute('name')}
+                </md-data-table-cell>
+                <md-data-table-cell>
+                  <md-filled-text-field name="absolute_quantity" label="Quantity" errorText={this.errors.absolute_quantity?.[0]} error={'absolute_quantity' in this.errors}/>
+                </md-data-table-cell>
+              </md-data-table-row>
+            ))}
+          </md-data-table>
         </div>
       </div>
     )
@@ -69,11 +80,50 @@ export default class Donuts extends RecordsPage<Donut> {
 
   async saveRelations(record: Donut, event: FormSubmitEvent) {
     const form = event.target as HTMLFormElement;
-    const ingredientsChips = form.querySelectorAll<FilterChip>('md-filter-chip[data-relation="ingredient"]');
-    record.setRelation('ingredients', [...ingredientsChips]
-      .filter((chip) => chip.selected)
-      .map((chip) => this.ingredients.find(
-        (ingredient) => ingredient.getId() === chip.dataset.recordId)!
-      ));
+    const datatable = form.querySelector<DataTable>('md-data-table');
+    const ids = datatable!.rows.filter((row)=> row.selected).map((row) => row.dataset.recordId)
+
+    record.setRelation('ingredients', ids.map((id) => this.ingredients.find((ingredient) => ingredient.getId() === id)!))
+    // record.setRelationPivotData()
+    // const ingredientCheckboxes = form.querySelectorAll<MdDataTableCell>('md-data-table-cell[data-relation="ingredient"]');
+    // record.setRelation('ingredients', [...ingredientCheckboxes]
+    //   .filter((checkbox) => checkbox.getAttribute(''))
+    //   .map((checkbox) => this.ingredients.find(
+    //     (ingredient) => ingredient.getId() === checkbox.dataset.recordId)!
+    //   ));
   }
 }
+/* alternatives for quantity field
+1:
+<md-data-table>
+            <DataTableColumn type="checkbox"></DataTableColumn>
+            <DataTableColumn filterable sortable>Ingredient</DataTableColumn>
+            <DataTableColumn>Quantity</DataTableColumn>
+            {this.ingredients.map((ingredient) => (
+              <md-data-table-row>
+                <md-data-table-cell data-relation="ingredient" data-record-id={ingredient.getId()} type="checkbox"></md-data-table-cell>
+                <md-data-table-cell>
+                  {ingredient.getAttribute('name')}
+                </md-data-table-cell>
+                <md-data-table-cell>
+                  <md-filled-text-field name="absolute_quantity" label="Quantity" errorText={this.errors.absolute_quantity?.[0]} error={'absolute_quantity' in this.errors}/>
+                </md-data-table-cell>
+              </md-data-table-row>
+            ))}
+          </md-data-table>
+
+2: doesn't work
+{this.ingredients.map((ingredient) => (
+  <md-filter-chip data-relation="ingredient" data-record-id={ingredient.getId()} label={ingredient.getAttribute('name')}>
+    {ingredient.getAttribute('allergen') && <MdIcon slot="icon" icon={mdiAlertOutline}/>}
+    <md-filled-text-field name="absolute_quantity" label="Quantity" errorText={this.errors.quantity?.[0]} error={'quantity' in this.errors}/>
+  </md-filter-chip>
+))}
+
+original:
+{this.ingredients.map((ingredient) => (
+  <md-filter-chip data-relation="ingredient" data-record-id={ingredient.getId()} label={ingredient.getAttribute('name')}>
+    {ingredient.getAttribute('allergen') && <MdIcon slot="icon" icon={mdiAlertOutline}/>}
+  </md-filter-chip>
+))}
+*/

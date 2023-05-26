@@ -17,7 +17,6 @@ import '@material/web/iconbutton/standard-icon-button.js';
 import {Dialog} from '@material/web/dialog/lib/dialog';
 import Form, {FormAttributes, FormSubmitEvent} from 'mithril-utilities/dist/Form';
 import {RequestError} from 'mithril-utilities';
-import Ingredient from '~/Models/Ingredient';
 import {showSnackbar} from '~/utils';
 
 
