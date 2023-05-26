@@ -15,7 +15,7 @@ import '@material/web/dialog/dialog.js';
 import '@material/web/button/text-button.js';
 import '@material/web/iconbutton/standard-icon-button.js';
 import {Dialog} from '@material/web/dialog/lib/dialog';
-import Form, {FormAttributes} from 'mithril-utilities/dist/Form';
+import Form, {FormAttributes, FormSubmitEvent} from 'mithril-utilities/dist/Form';
 import {RequestError} from 'mithril-utilities';
 import Ingredient from '~/Models/Ingredient';
 import {showSnackbar} from '~/utils';
@@ -174,12 +174,12 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
   }
 
   abstract formContents(): Children;
-  async formSubmit() {
+  async formSubmit(event: FormSubmitEvent) {
     // @ts-expect-error — this is a hack to get around that the type of the model is not known at compile time
     let record = this.selectedRecord ?? new this.modelType();
 
-    await this.saveAttributes(record)
-    await this.saveRelations(record);
+    await this.saveAttributes(record, event)
+    await this.saveRelations(record, event);
 
     try {
       let result = await record.save();
@@ -197,7 +197,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
     }
   };
 
-  async saveAttributes(record: M) {
+  async saveAttributes(record: M, event: FormSubmitEvent) {
     for (const [key, value] of Object.entries(this.formState!)) {
       if (record.attributesNames.includes(key)) {
         record.setAttribute(key, value());
@@ -205,5 +205,5 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
     }
   }
 
-  abstract saveRelations(record: M): Promise<void>;
+  abstract saveRelations(record: M, event: FormSubmitEvent): Promise<void>;
 }
