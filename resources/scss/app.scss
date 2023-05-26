@@ -50,6 +50,11 @@ md-icon svg {
     line-height: 0;
 }
 
+md-filter-chip md-icon svg {
+    width: var(--_icon-size);
+    height: var(--_icon-size);
+}
+
 :is(md-list-item, md-list-item-link) md-icon {
     padding-left: 16px;
     --md-icon-color: var(--_list-item-leading-icon-color);
