@@ -261,6 +261,11 @@ abstract class Repository extends RestifyRepository
             $data['included'] = array_filter($included);
         }
 
+        // Remove included from relationships (we already have them in included)
+        foreach ($data['data']['relationships'] as &$relationship) {
+            Arr::forget($relationship, 'included');
+        }
+
         return $response->setData($data);
     }
 }
