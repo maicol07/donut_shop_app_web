@@ -22,6 +22,8 @@ export default class Donuts extends RecordsPage<Donut> {
     description: Stream('')
   }
   ingredients: Ingredient[] = []
+  // @ts-ignore
+  with = ['ingredients'];
 
   tableColumns(): Collection<Child> {
     return collect({
@@ -34,10 +36,14 @@ export default class Donuts extends RecordsPage<Donut> {
     });
   }
 
-  attributeMap(name: keyof DonutAttributes, value: ValueOf<DonutAttributes>) {
+  attributeMap(name: keyof DonutAttributes, value: ValueOf<DonutAttributes>, record: Donut) {
     return match(name)
-      .with("allergen", () => value ? 'Yes' : 'No')//is this needed?
-      .otherwise(() => super.attributeMap(name, value));
+      .with('ingredients', () => {
+        return record.getRelation('ingredients')
+          ?.map((ingredient) => `${ingredient.getAttribute("name")} (${ingredient.getPivot('absolute_quantity')})`)
+          .join(", ");
+      })
+      .otherwise(() => super.attributeMap(name, value, record));
   }
 
   formContents(): Mithril.Children {
@@ -58,17 +64,27 @@ export default class Donuts extends RecordsPage<Donut> {
             <DataTableColumn type="checkbox"></DataTableColumn>
             <DataTableColumn filterable sortable>Ingredient</DataTableColumn>
             <DataTableColumn>Quantity</DataTableColumn>
-            {this.ingredients.map((ingredient) => (
-              <md-data-table-row data-relation="ingredient" data-record-id={ingredient.getId()}>
-                <md-data-table-cell type="checkbox"></md-data-table-cell>
-                <md-data-table-cell>
-                  {ingredient.getAttribute('name')}
-                </md-data-table-cell>
-                <md-data-table-cell>
-                  <md-filled-text-field name="absolute_quantity" label="Quantity" errorText={this.errors.absolute_quantity?.[0]} error={'absolute_quantity' in this.errors}/>
-                </md-data-table-cell>
-              </md-data-table-row>
-            ))}
+            {this.ingredients.map((ingredient) => {
+              const relationIngredient = this.selectedRecord?.getRelation('ingredients')?.find((relationIngredient) => relationIngredient.getId() === ingredient.getId());
+              const absoluteQuantityName = `absolute_quantity_${ingredient.getId()}`;
+              return (
+                <md-data-table-row data-relation="ingredient" data-record-id={ingredient.getId()} selected={relationIngredient !== undefined}>
+                  <md-data-table-cell type="checkbox"></md-data-table-cell>
+                  <md-data-table-cell>
+                    {ingredient.getAttribute('name')}
+                  </md-data-table-cell>
+                  <md-data-table-cell>
+                    <md-filled-text-field // TODO: Change to outlined for more visibility? Smaller?
+                      name={absoluteQuantityName}
+                      label="Quantity"
+                      errorText={this.errors[absoluteQuantityName]?.[0]}
+                      error={absoluteQuantityName in this.errors}
+                      // TODO: Add type="number" to only allow numbers
+                      value={relationIngredient?.getPivot('absolute_quantity') as unknown as string}/>
+                  </md-data-table-cell>
+                </md-data-table-row>
+              )
+            })}
           </md-data-table>
         </div>
       </div>
@@ -80,14 +96,13 @@ export default class Donuts extends RecordsPage<Donut> {
     const datatable = form.querySelector<DataTable>('md-data-table');
     const ids = datatable!.rows.filter((row)=> row.selected).map((row) => row.dataset.recordId)
 
-    record.setRelation('ingredients', ids.map((id) => this.ingredients.find((ingredient) => ingredient.getId() === id)!))
-    // record.setRelationPivotData()
-    // const ingredientCheckboxes = form.querySelectorAll<MdDataTableCell>('md-data-table-cell[data-relation="ingredient"]');
-    // record.setRelation('ingredients', [...ingredientCheckboxes]
-    //   .filter((checkbox) => checkbox.getAttribute(''))
-    //   .map((checkbox) => this.ingredients.find(
-    //     (ingredient) => ingredient.getId() === checkbox.dataset.recordId)!
-    //   ));
+    record.setRelation('ingredients', ids.map((id) => {
+      const ingredient = this.ingredients.find((ingredient) => ingredient.getId() === id)!;
+      const absoluteQuantityName = `absolute_quantity_${ingredient.getId()}`;
+      const absoluteQuantity = form.querySelector<HTMLInputElement>(`[name="${absoluteQuantityName}"]`)!.value as unknown as number;
+      ingredient.setPivot('absolute_quantity', absoluteQuantity);
+      return ingredient;
+    }))
   }
 }
 /* alternatives for quantity field
