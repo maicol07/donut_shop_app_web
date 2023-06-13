@@ -1,10 +1,15 @@
-<?php /** @noinspection MissingParentCallInspection */
+<?php
 
 namespace App\Restify;
+
+use Illuminate\Http\Request;
+use function assert;
 
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Fields\Field;
 use Binaryk\LaravelRestify\Fields\FieldCollection;
+use Binaryk\LaravelRestify\Filters\Filter;
+use Binaryk\LaravelRestify\Filters\MatchFilter;
 use Binaryk\LaravelRestify\Http\Controllers\RepositoryAttachController;
 use Binaryk\LaravelRestify\Http\Controllers\RepositorySyncController;
 use Binaryk\LaravelRestify\Http\Requests\RepositoryAttachRequest;
@@ -12,16 +17,26 @@ use Binaryk\LaravelRestify\Http\Requests\RepositorySyncRequest;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Repositories\Repository as RestifyRepository;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+
+use function in_array;
+use function is_array;
+
 use Nette\Utils\Json;
-use Symfony\Component\HttpFoundation\Response;
 
 abstract class Repository extends RestifyRepository
 {
+    public static array $sort = ['id'];
+
+    public static array $match = ['id'];
+
+    public static function matches(): array
+    {
+        return array_map(static fn (string $type): Filter => MatchFilter::make()->setType($type)->partial(), static::$match);
+    }
 
     public static function authorizedToStore(Request $request): bool
     {
@@ -70,6 +85,7 @@ abstract class Repository extends RestifyRepository
 
     public function getStoringRules(RestifyRequest $request): array
     {
+        /** @psalm-suppress InvalidArrayOffset */
         return $this->collectFields($request)->mapWithKeys(static fn (Field $k) => [
             ($k->label ?? $k->attribute) => $k->getStoringRules(),
         ])->toArray();
@@ -90,6 +106,102 @@ abstract class Repository extends RestifyRepository
         }
 
         return $fields;
+    }
+
+    /**
+     * Return a list with relationship for the current model.
+     *
+     * @param RestifyRequest $request
+     */
+    public function resolveRelationships($request): array
+    {
+        return Arr::whereNotNull(Arr::map(parent::resolveRelationships($request), static function (self|Collection|null $repository) use ($request) {
+            if ($repository instanceof self) {
+                return [
+                    'data' => [
+                        'id' => $repository->getId($request),
+                        'type' => $repository->getType($request),
+                    ],
+                    'included' => $repository,
+                ];
+            }
+
+            if ($repository instanceof Collection && $repository->isNotEmpty()) {
+                return [
+                    'data' => $repository->map(static fn (self $repository) => [
+                        'id' => $repository->getId($request),
+                        'type' => $repository->getType($request),
+                    ]),
+                    'included' => $repository,
+                ];
+            }
+
+            return null;
+        }));
+    }
+
+    public function index(RestifyRequest $request): JsonResponse
+    {
+        $response = parent::index($request);
+        $data = $response->getData(true);
+
+        $included = Arr::collapse(Arr::pluck($data['data'], 'relationships.*.included'));
+        $included = array_filter($included);
+
+        // Merge all included
+        foreach ($included as $key => $value) {
+            if (is_array($value[0] ?? null)) {
+                unset($included[$key]);
+                $included = [...$included, ...$value];
+            }
+        }
+
+        // Remove duplicates with same id (nested array)
+        $ids = [];
+        foreach ($included as $key => $value) {
+            if (in_array($value['id'], $ids[$value['type']] ?? [], true)) {
+                unset($included[$key]);
+            } else {
+                $ids[$value['type']][] = $value['id'];
+            }
+        }
+
+        $data['included'] = $included;
+
+        // Remove included from relationships (we already have them in included)
+        foreach ($data['data'] as &$item) {
+            if (isset($item['relationships'])) {
+                foreach ($item['relationships'] as &$relationship) {
+                    Arr::forget($relationship, 'included');
+                }
+            }
+        }
+
+        return $response->setData($data);
+    }
+
+    public function show(RestifyRequest $request, $repositoryId): JsonResponse
+    {
+        $response = parent::show($request, $repositoryId);
+        $data = $response->getData(true);
+
+        $rel = Arr::get($data, 'data.relationships');
+
+        if ($rel) {
+            $included = Arr::pluck($rel, 'included');
+
+            /**
+             * @return array|RestifyRepository|Collection|null
+             */
+            $data['included'] = array_filter($included);
+        }
+
+        // Remove included from relationships (we already have them in included)
+        foreach ($data['data']['relationships'] as &$relationship) {
+            Arr::forget($relationship, 'included');
+        }
+
+        return $response->setData($data);
     }
 
     /**
@@ -189,83 +301,5 @@ abstract class Repository extends RestifyRepository
             ...$attributes,
             ...$relationships,
         ]);
-    }
-
-    /**
-     * Return a list with relationship for the current model.
-     *
-     * @param RestifyRequest $request
-     */
-    public function resolveRelationships($request): array
-    {
-        return Arr::whereNotNull(Arr::map(parent::resolveRelationships($request), static function (self|Collection|null $repository) use ($request) {
-            if ($repository instanceof self) {
-                return [
-                    'data' => [
-                        'id' => $repository->getId($request),
-                        'type' => $repository->getType($request),
-                    ],
-                    'included' => $repository,
-                ];
-            }
-
-            if ($repository instanceof Collection && $repository->isNotEmpty()) {
-                return [
-                    'data' => $repository->map(static fn (self $repository) => [
-                        'id' => $repository->getId($request),
-                        'type' => $repository->getType($request),
-                    ]),
-                    'included' => $repository
-                ];
-            }
-
-            return null;
-        }));
-    }
-
-    public function index(RestifyRequest $request): JsonResponse
-    {
-        $response = parent::index($request);
-        $data = $response->getData(true);
-
-        $included = Arr::collapse(Arr::pluck($data['data'], 'relationships.*.included'));
-
-        $included = array_filter($included);
-        $data['included'] = Arr::collapse($included);
-
-        // Remove included from relationships (we already have them in included)
-        foreach ($data['data'] as &$item) {
-            if (isset($item['relationships'])) {
-                foreach ($item['relationships'] as &$relationship) {
-                    Arr::forget($relationship, 'included');
-                }
-            }
-        }
-
-        return $response->setData($data);
-    }
-
-    public function show(RestifyRequest $request, $repositoryId): JsonResponse
-    {
-        $response = parent::show($request, $repositoryId);
-        $data = $response->getData(true);
-
-        $rel = Arr::get($data, 'data.relationships');
-
-        if ($rel) {
-            $included = Arr::pluck($rel, 'included');
-
-            /**
-             * @return array|RestifyRepository|Collection|null
-             */
-            $data['included'] = array_filter($included);
-        }
-
-        // Remove included from relationships (we already have them in included)
-        foreach ($data['data']['relationships'] as &$relationship) {
-            Arr::forget($relationship, 'included');
-        }
-
-        return $response->setData($data);
     }
 }
