@@ -1,8 +1,9 @@
 import Model, {
   ModelAttributes,
-  ModelRelations, ModelRelationsPivots
+  ModelRelations
 } from '~/Models/Model';
 import Ingredient from '~/Models/Ingredient';
+import {ToManyRelation} from 'coloquent';
 
 export interface DonutAttributes extends ModelAttributes {
   name: string;
@@ -11,7 +12,7 @@ export interface DonutAttributes extends ModelAttributes {
 }
 
 export interface DonutRelations extends ModelRelations {
-  ingredients: Ingredient
+  ingredients: Ingredient[]
 }
 
 export interface DonutRelationsPivots extends ModelRelationsPivots {
@@ -25,5 +26,9 @@ export default class Donut extends Model<DonutAttributes, DonutRelations> {
 
   protected static get jsonApiType() {
     return `donuts`;
+  }
+
+  ingredients() {
+    return new ToManyRelation(Ingredient);
   }
 }
