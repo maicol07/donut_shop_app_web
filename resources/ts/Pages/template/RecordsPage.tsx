@@ -35,6 +35,9 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
   selectedRecord: M | undefined;
   isTableLoading: boolean = false;
 
+  // @ts-ignore
+  with: keyof M['__relationsNames'] = [];
+
   contents() {
     return (
       <>
@@ -118,7 +121,8 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
   async loadRecords() {
     this.isTableLoading = true;
     m.redraw();
-    let response = await this.modelType.all<M>();
+    // @ts-ignore
+    let response = await this.modelType.query<M>().with(this.with).get();
     this.records = response.getData();
     this.isTableLoading = false;
     m.redraw();
