@@ -15,12 +15,6 @@ export interface DonutRelations extends ModelRelations {
   ingredients: Ingredient[]
 }
 
-export interface DonutRelationsPivots extends ModelRelationsPivots {
-  ingredients: {
-    absolute_quantity: number
-  }
-}
-
 export default class Donut extends Model<DonutAttributes, DonutRelations> {
   attributesNames = ['name', 'price', 'description'];
 

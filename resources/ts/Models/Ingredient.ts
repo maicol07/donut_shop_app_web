@@ -1,5 +1,6 @@
 import Model, {
   ModelAttributes,
+  ModelPivots,
   ModelRelations
 } from '~/Models/Model';
 
@@ -12,6 +13,10 @@ export interface IngredientRelations extends ModelRelations {
   // notifications: DatabaseNotifications
 }
 
-export default class Ingredient extends Model<IngredientAttributes, IngredientRelations> {
+export interface IngredientPivots extends ModelPivots {
+  absolute_quantity: number
+}
+
+export default class Ingredient extends Model<IngredientAttributes, IngredientRelations, IngredientPivots> {
   attributesNames = ['name', 'allergen'];
 }

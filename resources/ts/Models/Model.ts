@@ -16,26 +16,24 @@ export interface ModelAttributes {
   [key: string]: unknown;
 }
 
-export interface ModelRelations {
-  [key: string]: unknown;
+export interface ModelRelations extends Record<string, Model<any, any> | Model<any, any>[]>{
 }
 
-export interface ModelRelationsPivots extends Record<string, Record<string, unknown>> {
+export interface ModelPivots extends Record<string, unknown> {
 }
 
 /**
  * The base model for all models.
  */
 // @ts-expect-error – Necessary for overriding serialize
-export default abstract class Model<A extends ModelAttributes, R extends ModelRelations = ModelRelations, RP extends ModelRelationsPivots = ModelRelationsPivots> extends BaseModel {
+export default abstract class Model<A extends ModelAttributes, R extends ModelRelations = ModelRelations, P extends ModelPivots = ModelPivots> extends BaseModel {
   protected static paginationStrategy = PaginationStrategy.PageBased;
   protected static jsonApiBaseUrl = '/api';
   protected static httpClient = new RequestHttpClient();
-  // @ts-ignore
-  private relationsPivots: RP = {};
+  protected pivots: P = {} as P;
 
   abstract attributesNames: (keyof A)[];
-  __relations!: (keyof R)[];
+  __relationsNames!: (keyof R)[];
 
   static dates = {
     createdAt: 'YYYY-MM-DDTHH:mm:ss.ssssssZ',
@@ -85,35 +83,37 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
   }
 
   getRelation<RN extends keyof R = keyof R>(relationName: RN) {
-    return super.getRelation(relationName as string) as ValueOf<R, RN> | ValueOf<R, RN>[];
+    return super.getRelation(relationName as string) as ValueOf<R, RN> | undefined;
   }
 
-  setRelation<RN extends keyof R = keyof R>(relationName: RN, value: ValueOf<R, RN> | ValueOf<R, RN>[]) {
+  setRelation<RN extends keyof R = keyof R>(relationName: RN, value: ValueOf<R, RN>) {
     super.setRelation(relationName as string, value);
   }
 
-  getRelationPivotData<RPN extends keyof RP = keyof RP>(relationName: RPN): ValueOf<RP, RPN> {
-    return this.relationsPivots[relationName];
+  getPivots() {
+    return this.pivots;
   }
 
-  setRelationPivotData<RPN extends keyof RP = keyof RP>(relationName: RPN, value: ValueOf<RP, RPN>) {
-    this.relationsPivots[relationName] = value;
+  getPivot<PN extends keyof P = keyof P>(key: PN): ValueOf<P, PN> {
+    return this.pivots[key];
   }
 
-  private serialize() {
-    // @ts-expect-error - Serialize is private
-    const data: {data: Resource & {attributes: ModelAttributes; relationships: Record<string, {data: { type: string; id: string; attributes: Record<string, unknown>, pivots: Record<string, unknown> }}>}} = super.serialize();
-    for (const relationName of Object.keys(this.relationsPivots)) {
-      data.data.relationships[relationName].data.pivots = this.relationsPivots[relationName];
-    }
+  setPivot<PN extends keyof P = keyof P>(key: PN, value: ValueOf<P, PN>) {
+    this.pivots[key] = value;
+  }
+
+  private serializeRelatedModel(model: Model<any, any>) {
+    // @ts-expect-error - `serializeRelatedModel` is private in coloquent
+    const data: {type: string, id: string, pivots?: Record<string, unknown>} = super.serializeRelatedModel(model);
+    data.pivots = model.getPivots();
     return data;
   }
 
-  populateFromResource(resource: Resource) {
+  populateFromResource(resource: Resource & {pivots?: P}) {
     super.populateFromResource(resource);
 
-    for (const relationName of Object.keys(resource.relationships)) {
-      this.setRelationPivotData(relationName, resource.relationships[relationName].data.pivots);
+    if (resource.pivots) {
+      this.pivots = resource.pivots;
     }
   }
 
