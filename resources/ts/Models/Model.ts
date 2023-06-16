@@ -31,6 +31,7 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
   protected static jsonApiBaseUrl = '/api';
   protected static httpClient = new RequestHttpClient();
   protected pivots: P = {} as P;
+  protected resource: Resource & {relationships: R} | undefined = undefined;
 
   abstract attributesNames: (keyof A)[];
   __relationsNames!: (keyof R)[];
@@ -82,16 +83,50 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
     this.attributes.set(attributeName as string, value);
   }
 
+  getRelations(): R {
+    return super.getRelations() as R;
+  }
+
   getRelation<RN extends keyof R = keyof R>(relationName: RN) {
     return super.getRelation(relationName as string) as ValueOf<R, RN> | undefined;
   }
 
   setRelation<RN extends keyof R = keyof R>(relationName: RN, value: ValueOf<R, RN>) {
+    // Set related model pivots
+    const rel = this.resource?.relationships?.[relationName]?.data;
+    if (rel !== undefined) {
+      if (value instanceof Model && Object.keys(value.getPivots()).length === 0) {
+        let pivots = {};
+        if (Array.isArray(rel)) {
+          pivots = rel.find((r) => r.id === value.getId())?.pivots ?? {};
+        } else {
+          pivots = rel.pivots ?? {};
+        }
+        value.setPivots(pivots);
+      } else if (Array.isArray(value)) {
+        for (const relatedModel of value) {
+          if (Object.keys(relatedModel.getPivots()).length === 0) {
+            let pivots = {};
+            if (Array.isArray(rel)) {
+              pivots = rel.find((r) => r.id === relatedModel.getId())?.pivots ?? {};
+            } else {
+              pivots = rel.pivots ?? {};
+            }
+            relatedModel.setPivots(pivots);
+          }
+        }
+      }
+    }
+
     super.setRelation(relationName as string, value);
   }
 
   getPivots() {
     return this.pivots;
+  }
+
+  setPivots(pivots: P) {
+    this.pivots = pivots;
   }
 
   getPivot<PN extends keyof P = keyof P>(key: PN): ValueOf<P, PN> {
@@ -109,12 +144,9 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
     return data;
   }
 
-  populateFromResource(resource: Resource & {pivots?: P}) {
+  populateFromResource(resource: Resource & {relationships: R, pivots?: P}) {
     super.populateFromResource(resource);
-
-    if (resource.pivots) {
-      this.pivots = resource.pivots;
-    }
+    this.resource = resource;
   }
 
   /**
