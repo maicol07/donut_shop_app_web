@@ -121,6 +121,7 @@ abstract class Repository extends RestifyRepository
                     'data' => [
                         'id' => $repository->getId($request),
                         'type' => $repository->getType($request),
+                        'pivots' => $repository->resolveShowPivots(),
                     ],
                     'included' => $repository,
                 ];
@@ -131,6 +132,7 @@ abstract class Repository extends RestifyRepository
                     'data' => $repository->map(static fn (self $repository) => [
                         'id' => $repository->getId($request),
                         'type' => $repository->getType($request),
+                        'pivots' => $repository->resolveShowPivots($request)
                     ]),
                     'included' => $repository,
                 ];
@@ -149,12 +151,22 @@ abstract class Repository extends RestifyRepository
         $included = array_filter($included);
 
         // Merge all included
-        foreach ($included as $key => $value) {
+        function merge(array $value, string|int $key, array &$parent): void
+        {
             if (is_array($value[0] ?? null)) {
-                unset($included[$key]);
-                $included = [...$included, ...$value];
+                foreach ($value as $k => $v) {
+                    merge($v, $k, $value);
+                }
+                unset($parent[$key]);
+                $parent = [...$parent, ...$value];
             }
         }
+
+        /** @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection */
+        foreach ($included as $key => &$value) {
+            merge($value, $key, $included);
+        }
+        unset($value);
 
         // Remove duplicates with same id (nested array)
         $ids = [];
@@ -166,7 +178,13 @@ abstract class Repository extends RestifyRepository
             }
         }
 
-        $data['included'] = $included;
+        // Remove pivot from included
+        foreach ($included as &$item) {
+            Arr::forget($item, 'pivots');
+        }
+        unset($item);
+
+        $data['included'] = array_values($included);
 
         // Remove included from relationships (we already have them in included)
         foreach ($data['data'] as &$item) {
@@ -188,12 +206,36 @@ abstract class Repository extends RestifyRepository
         $rel = Arr::get($data, 'data.relationships');
 
         if ($rel) {
-            $included = Arr::pluck($rel, 'included');
+            $included = array_filter(Arr::pluck($rel, 'included'));
+
+            // Merge all included
+            function merge(array $value, string|int $key, array &$parent): void
+            {
+                if (is_array($value[0] ?? null)) {
+                    foreach ($value as $k => $v) {
+                        merge($v, $k, $value);
+                    }
+                    unset($parent[$key]);
+                    $parent = [...$parent, ...$value];
+                }
+            }
+
+            /** @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection */
+            foreach ($included as $key => &$value) {
+                merge($value, $key, $included);
+            }
+            unset($value);
+
+            // Remove pivots from included
+            foreach ($included as &$value) {
+                Arr::forget($value, 'pivots');
+            }
+            unset($value);
 
             /**
              * @return array|RestifyRepository|Collection|null
              */
-            $data['included'] = array_filter($included);
+            $data['included'] = array_values($included);
         }
 
         // Remove included from relationships (we already have them in included)
