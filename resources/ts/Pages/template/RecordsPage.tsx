@@ -62,7 +62,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
           </div>
         </div>
 
-        <md-dialog id="dialog" open={this.openDialog}>
+        <md-dialog id="dialog" open={this.openDialog} style={{"--md-dialog-container-min-block-size":"82%"}}>
           <span slot="header">{this.selectedRecord? "Edit":"Add"} Record</span>
 
           <Form id="form" state={this.formState} onsubmit={this.formSubmit.bind(this)} >
