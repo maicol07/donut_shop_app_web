@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Account extends Model
 {
@@ -19,5 +20,9 @@ class Account extends Model
     final public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, "fiscal_code");
+    }
+    final public function onlineSales(): HasMany
+    {
+        return $this->hasMany(OnlineSale::class);
     }
 }

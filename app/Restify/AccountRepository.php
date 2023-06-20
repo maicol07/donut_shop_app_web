@@ -4,6 +4,7 @@ namespace App\Restify;
 
 use App\Models\Account;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
+use Binaryk\LaravelRestify\Fields\HasMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class AccountRepository extends Repository
@@ -27,7 +28,8 @@ class AccountRepository extends Repository
     public static function related(): array
     {
         return [
-            BelongsTo::make('customer')
+            BelongsTo::make('customer'),
+            HasMany::make('onlineSales')
         ];
     }
 }
