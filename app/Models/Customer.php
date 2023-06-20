@@ -28,6 +28,6 @@ class Customer extends Model
 
     final public function company(): BelongsTo
     {
-        return $this->belongsTo(Company::class, "vat_number");
+        return $this->belongsTo(Company::class, ownerKey: "vat_number");
     }
 }

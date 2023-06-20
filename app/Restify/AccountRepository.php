@@ -22,6 +22,8 @@ class AccountRepository extends Repository
             field('password')->required()->rules('string', 'min:8'),
             field("created_at")->readonly(),
             field("updated_at")->readonly(),
+
+            BelongsTo::make('customer')
         ];
     }
 

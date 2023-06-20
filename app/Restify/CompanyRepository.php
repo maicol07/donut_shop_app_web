@@ -17,7 +17,7 @@ class CompanyRepository extends Repository
     {
         return [
             field('name')->required(),
-            field('vat_number')->required()->rules('string')->storingRules('unique:companies,vat_number'),
+            field('vat_number')->label('vatNumber')->required()->rules('string')->storingRules('unique:companies,vat_number'),
             field("created_at")->readonly(),
             field("updated_at")->readonly(),
         ];
@@ -27,7 +27,7 @@ class CompanyRepository extends Repository
     {
         return [
             HasMany::make('supplies'),
-            HasMany::make('customer')
+            HasMany::make('customers', CustomerRepository::class)
         ];
     }
 }

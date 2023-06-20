@@ -18,10 +18,10 @@ class CustomerRepository extends Repository
         return [
             field('name')->required()->rules('string'),
             field('surname')->required()->rules('string'),
-            field('fiscal_code')->required()->rules('string')->storingRules('unique:customers,fiscal_code'),
+            field('fiscal_code')->label('fiscalCode')->required()->rules('string')->storingRules('unique:customers,fiscal_code'),
             field('birth_date')->required()->rules('date'),
             field('street')->required()->rules('string'),
-            field('house_number')->required()->rules('string'),
+            field('house_number')->label('houseNumber')->required()->rules('string'),
             field('cap')->required()->rules('string'),
             field('city')->required()->rules('string'),
             field('province')->required()->rules('string'),
@@ -34,7 +34,9 @@ class CustomerRepository extends Repository
     public static function related(): array
     {
         return [
-            BelongsTo::make('company')
+            BelongsTo::make('company', CompanyRepository::class)
         ];
     }
 }
+
+// Codici fiscali di prova: RJGCLS66A02Z131H, RSSMRA00A01C573L

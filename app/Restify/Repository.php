@@ -121,7 +121,7 @@ abstract class Repository extends RestifyRepository
                     'data' => [
                         'id' => $repository->getId($request),
                         'type' => $repository->getType($request),
-                        'pivots' => $repository->resolveShowPivots(),
+                        'pivots' => $repository->resolveShowPivots($request),
                     ],
                     'included' => $repository,
                 ];
@@ -239,7 +239,7 @@ abstract class Repository extends RestifyRepository
         }
 
         // Remove included from relationships (we already have them in included)
-        foreach ($data['data']['relationships'] as &$relationship) {
+        foreach (($data['data']['relationships'] ?? []) as &$relationship) {
             Arr::forget($relationship, 'included');
         }
 

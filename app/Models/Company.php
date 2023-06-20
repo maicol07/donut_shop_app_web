@@ -15,14 +15,15 @@ class Company extends Model
 
     protected $primaryKey = 'vat_number';
     protected $keyType = 'string';
+    public $incrementing = false;
 
     final public function supplies(): HasMany
     {
-        return $this->hasMany(Supply::class, "company_vat_number");
+        return $this->hasMany(Supply::class, "vat_number");
     }
 
-    final public function customer(): HasMany
+    final public function customers(): HasMany
     {
-        return $this->hasMany(Customer::class, "company_vat_number");
+        return $this->hasMany(Customer::class, "vat_number");
     }
 }

@@ -14,8 +14,8 @@ class TariffRepository extends Repository
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('discount_id')->required()->rules("string"),
-            field('donut_id')->required()->rules("string"),
+//            field('discount_id')->label('discountId')->required()->rules("string"),
+//            field('donut_id')->label('donutId')->required()->rules("string"),
             field('quantity')->required()->rules("string", "numeric"),
             field("updated_at")->readonly(),
             field("created_at")->readonly()
