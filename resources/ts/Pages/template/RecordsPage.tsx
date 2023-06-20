@@ -188,6 +188,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
       let result = await record.save();
       if (result.getModelId()) {
         this.openDialog = false;
+        void showSnackbar("Record saved successfully!");
         await this.loadRecords();
       } else {
         void showSnackbar("Error! Cannot save the record!");
