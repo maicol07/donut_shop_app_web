@@ -28,10 +28,10 @@ export default class Ingredients extends RecordsPage<Ingredient> {
     });
   }
 
-  attributeMap(name: keyof IngredientAttributes, value: ValueOf<IngredientAttributes>) {
+  attributeMap(name: keyof IngredientAttributes, value: ValueOf<IngredientAttributes>, record: Ingredient) {
     return match(name)
       .with("allergen", () => value ? 'Yes' : 'No')
-      .otherwise(() => super.attributeMap(name, value));
+      .otherwise(() => super.attributeMap(name, value, record));
   }
 
   formContents(): Mithril.Children {
