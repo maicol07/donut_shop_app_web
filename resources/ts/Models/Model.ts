@@ -3,10 +3,12 @@ import {
   PaginationStrategy,
   PluralResponse
 } from 'coloquent';
-import type {Constructor, ValueOf} from 'type-fest';
+import type {Class, Constructor, ValueOf} from 'type-fest';
 
 import RequestHttpClient from '~/Models/Http/RequestHttpClient';
 import {Resource} from 'coloquent/dist/Resource';
+import {ToOneRelation} from 'coloquent/dist/relation/ToOneRelation';
+import {ToManyRelation} from 'coloquent/dist/relation/ToManyRelation';
 
 export interface ModelAttributes {
   id: number;
@@ -22,10 +24,10 @@ export interface ModelRelations extends Record<string, Model<any, any> | Model<a
 export interface ModelPivots extends Record<string, unknown> {
 }
 
+// noinspection JSDuplicatedDeclaration
 /**
  * The base model for all models.
  */
-// @ts-expect-error – Necessary for overriding serialize
 export default abstract class Model<A extends ModelAttributes, R extends ModelRelations = ModelRelations, P extends ModelPivots = ModelPivots> extends BaseModel {
   protected static paginationStrategy = PaginationStrategy.PageBased;
   protected static jsonApiBaseUrl = '/api';
@@ -36,7 +38,7 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
   abstract attributesNames: (keyof A)[];
   __relationsNames!: (keyof R)[];
 
-  static dates = {
+  static dates: Record<string, string> = {
     createdAt: 'YYYY-MM-DDTHH:mm:ss.ssssssZ',
     updatedAt: 'YYYY-MM-DDTHH:mm:ss.ssssssZ'
   };
@@ -161,5 +163,29 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
    */
   isNew() {
     return this.getId() === undefined;
+  }
+
+  // @ts-ignore
+
+  protected hasOne<R extends Model<any>>(relatedType: Class<R>): ToOneRelation<R, this> {
+    // @ts-ignore
+    return super.hasOne(relatedType) as ToOneRelation<R, this>;
+  }
+  // @ts-ignore
+  protected hasOne<R extends Model<any>>(relatedType: Class<R>, relationName: string): ToOneRelation<R, this>{
+    // @ts-ignore
+    return super.hasOne(relatedType, relationName) as ToOneRelation<R, this>;
+  }
+
+  // @ts-ignore
+  protected hasMany<R extends Model<any>>(relatedType: Class<R>): ToManyRelation<R, this> {
+    // @ts-ignore
+    return super.hasMany(relatedType) as ToManyRelation<R, this>;
+  }
+
+  // @ts-ignore
+  protected hasMany<R extends Model<any>>(relatedType: Class<R>, relationName: string): ToManyRelation<R, this> {
+    // @ts-ignore
+    return super.hasMany(relatedType, relationName) as ToManyRelation<R, this>;
   }
 }

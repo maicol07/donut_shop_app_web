@@ -3,7 +3,6 @@ import Model, {
   ModelRelations
 } from '~/Models/Model';
 import Ingredient from '~/Models/Ingredient';
-import {ToManyRelation} from 'coloquent';
 
 export interface DonutAttributes extends ModelAttributes {
   name: string;
@@ -23,6 +22,6 @@ export default class Donut extends Model<DonutAttributes, DonutRelations> {
   }
 
   ingredients() {
-    return new ToManyRelation(Ingredient);
+    return this.hasMany(Ingredient);
   }
 }
