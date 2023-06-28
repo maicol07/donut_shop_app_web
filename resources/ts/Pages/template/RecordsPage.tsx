@@ -35,8 +35,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
   selectedRecord: M | undefined;
   isTableLoading: boolean = false;
 
-  // @ts-ignore
-  with: keyof M['__relationsNames'] = [];
+  with: M['__relationsNames'] = [];
 
   contents() {
     return (
