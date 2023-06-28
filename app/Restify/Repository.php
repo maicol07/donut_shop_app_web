@@ -16,8 +16,10 @@ use Binaryk\LaravelRestify\Http\Requests\RepositoryAttachRequest;
 use Binaryk\LaravelRestify\Http\Requests\RepositorySyncRequest;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Repositories\Repository as RestifyRepository;
+use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -132,7 +134,7 @@ abstract class Repository extends RestifyRepository
                     'data' => $repository->map(static fn (self $repository) => [
                         'id' => $repository->getId($request),
                         'type' => $repository->getType($request),
-                        'pivots' => $repository->resolveShowPivots($request)
+                        'pivots' => $repository->resolveShowPivots($request),
                     ]),
                     'included' => $repository,
                 ];
@@ -150,21 +152,23 @@ abstract class Repository extends RestifyRepository
         $included = Arr::collapse(Arr::pluck($data['data'], 'relationships.*.included'));
         $included = array_filter($included);
 
-        // Merge all included
-        function merge(array $value, string|int $key, array &$parent): void
-        {
-            if (is_array($value[0] ?? null)) {
-                foreach ($value as $k => $v) {
-                    merge($v, $k, $value);
+        foreach ($included as $value) {
+            // Extract included from relationships and sub relationships)
+            do {
+                $original = $value;
+                $value = Arr::collapse(Arr::pluck($value, 'relationships.*.included'));
+                $value = array_filter($value);
+                if (empty($value)) {
+                    $value = Arr::collapse(Arr::pluck($original, '*.included'));
+                    $value = array_filter($value);
                 }
-                unset($parent[$key]);
-                $parent = [...$parent, ...$value];
-            }
+                $included = [...$included, ...$value];
+            } while ($value);
         }
 
-        /** @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection */
+        // Merge all included
         foreach ($included as $key => &$value) {
-            merge($value, $key, $included);
+            $this->mergeIncludedRelationships($value, $key, $included);
         }
         unset($value);
 
@@ -198,6 +202,29 @@ abstract class Repository extends RestifyRepository
         return $response->setData($data);
     }
 
+    public function mergeIncludedRelationships(array $value, string|int $key, array &$parent): void
+    {
+        if (is_array($value[0] ?? null)) {
+            foreach ($value as $k => $v) {
+                $this->mergeIncludedRelationships($v, $k, $value);
+            }
+            unset($parent[$key]);
+            $parent = [...$parent, ...$value];
+        }
+    }
+
+    public function extractIncluded(array $resource, array &$included)
+    {
+        $inc = Arr::pluck($resource, 'included');
+        if ($inc) {
+            $included = [...$included, ...array_filter($inc)];
+            foreach ($inc as $key => $value) {
+                $rel_nested = Arr::get($value, 'relationships', []);
+                $this->extractIncluded($rel_nested, $included);
+            }
+        }
+    }
+
     public function show(RestifyRequest $request, $repositoryId): JsonResponse
     {
         $response = parent::show($request, $repositoryId);
@@ -206,29 +233,28 @@ abstract class Repository extends RestifyRepository
         $rel = Arr::get($data, 'data.relationships');
 
         if ($rel) {
-            $included = array_filter(Arr::pluck($rel, 'included'));
-
+            $included = [];
+            // Extract included from relationships and sub relationships (recursive)
+            $this->extractIncluded($rel, $included);
+//            $included = array_filter(Arr::pluck($rel, 'included'));
             // Merge all included
-            function merge(array $value, string|int $key, array &$parent): void
-            {
-                if (is_array($value[0] ?? null)) {
-                    foreach ($value as $k => $v) {
-                        merge($v, $k, $value);
-                    }
-                    unset($parent[$key]);
-                    $parent = [...$parent, ...$value];
-                }
-            }
-
-            /** @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection */
             foreach ($included as $key => &$value) {
-                merge($value, $key, $included);
+                $this->mergeIncludedRelationships($value, $key, $included);
             }
             unset($value);
 
             // Remove pivots from included
             foreach ($included as &$value) {
                 Arr::forget($value, 'pivots');
+            }
+            unset($value);
+
+            // Remove nested included from included
+            foreach ($included as $key => &$value) {
+                foreach ($value['relationships'] ?? [] as $k => $v) {
+                    Arr::forget($included, "$key.relationships.$k.included");
+                    Arr::forget($included, "$key.relationships.$k.data.pivots");
+                }
             }
             unset($value);
 
@@ -274,7 +300,7 @@ abstract class Repository extends RestifyRepository
          *     data: array{type: string, id: int}|array{type: string, id: int}[]
          * } $relationship
          */
-            static fn (array $relationship): int|array => Arr::get($relationship, 'data.id') ?? Arr::pluck($relationship['data'], 'pivots', 'id'),
+            static fn (array $relationship): string|int|array => Arr::get($relationship, 'data.id') ?? Arr::pluck($relationship['data'], 'pivots', 'id'),
             $relationships
         );
         $routes = Route::getRoutes()->getRoutesByMethod()['POST'];
@@ -338,6 +364,22 @@ abstract class Repository extends RestifyRepository
                 }
             }
         }
+
+        // Fix dates (JSONAPI uses ISO 8601, DB uses Y-m-d H:i:s)
+        $attributes = array_map(
+            static function ($value) {
+                if (is_string($value) && Carbon::hasFormat($value, 'Y-m-d\TH:i:sP')) {
+                    try {
+                        return Carbon::parse($value)->format('Y-m-d H:i:s');
+                    } catch (InvalidFormatException) {
+                        return $value;
+                    }
+                }
+
+                return $value;
+            },
+            $attributes
+        );
 
         $request->replace([
             ...$attributes,
