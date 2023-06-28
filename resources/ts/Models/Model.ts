@@ -9,6 +9,7 @@ import RequestHttpClient from '~/Models/Http/RequestHttpClient';
 import {Resource} from 'coloquent/dist/Resource';
 import {ToOneRelation} from 'coloquent/dist/relation/ToOneRelation';
 import {ToManyRelation} from 'coloquent/dist/relation/ToManyRelation';
+import dayjs from 'dayjs';
 
 export interface ModelAttributes {
   id: number;
@@ -80,6 +81,15 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
   }
 
   setAttribute<AN extends keyof A = keyof A>(attributeName: AN, value: ValueOf<A, AN>) {
+    // @ts-expect-error
+    if (this.isDateAttribute(attributeName)) {
+      // @ts-expect-error
+      const date = dayjs(value);
+      if (date.isValid()) {
+        // @ts-expect-error
+        value = date.format((this as Model<any>).constructor.dates[attributeName]);
+      }
+    }
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     // @ts-expect-error
     this.attributes.set(attributeName as string, value);

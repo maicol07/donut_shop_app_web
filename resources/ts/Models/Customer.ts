@@ -23,6 +23,10 @@ export interface CustomerRelations extends ModelRelations {
 
 export default class Customer extends Model<CustomerAttributes, CustomerRelations> {
   attributesNames = ['name', 'surname', 'fiscalCode', 'birthDate', 'street', 'houseNumber', 'cap', 'city', 'province', 'email'];
+  static dates = {
+    ...Model.dates,
+    birthDate: 'YYYY-MM-DDTHH:mm:ss.ssssssZ'
+  };
 
   company() {
     return this.hasOne(Company);
