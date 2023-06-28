@@ -12,7 +12,7 @@ import route from 'ziggy-js';
 
 export interface DrawerEntryAttributes extends Attributes {
   route: string;
-  icon: typeof MaterialIcons;
+  icon: typeof MaterialIcons | string;
 }
 
 export class DrawerEntry<A extends DrawerEntryAttributes = DrawerEntryAttributes> extends Component<A> {
