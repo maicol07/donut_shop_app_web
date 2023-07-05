@@ -19,15 +19,17 @@ class CustomerRepository extends Repository
             field('name')->required()->rules('string'),
             field('surname')->required()->rules('string'),
             field('fiscal_code')->label('fiscalCode')->required()->rules('string')->storingRules('unique:customers,fiscal_code'),
-            field('birth_date')->required()->rules('date'),
+            field('birth_date')->label('birthDate')->required()->rules('date'),
             field('street')->required()->rules('string'),
             field('house_number')->label('houseNumber')->required()->rules('string'),
             field('cap')->required()->rules('string'),
             field('city')->required()->rules('string'),
             field('province')->required()->rules('string'),
             field('email')->required()->rules('email'),
-            field("created_at")->readonly(),
-            field("updated_at")->readonly()
+            field("created_at")->label('createdAt')->readonly(),
+            field("updated_at")->label('updatedAt')->readonly(),
+
+            BelongsTo::make('company', CompanyRepository::class)
         ];
     }
 

@@ -4,6 +4,7 @@ namespace App\Restify;
 
 use App\Models\Sale;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
+use Binaryk\LaravelRestify\Fields\HasOne;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class SaleRepository extends Repository
@@ -15,10 +16,11 @@ class SaleRepository extends Repository
     {
         return [
             field('date')->required()->rules("date"),
-            field('shop_id')->required()->rules("string"),
-            field('supply_id')->required()->rules("string"),
             field("updated_at")->readonly(),
-            field("created_at")->readonly()
+            field("created_at")->readonly(),
+
+            BelongsTo::make('shop', ShopRepository::class),
+            BelongsTo::make('supply', SupplyRepository::class)
         ];
     }
 
@@ -26,7 +28,8 @@ class SaleRepository extends Repository
     {
         return [
             BelongsTo::make('shop', ShopRepository::class),
-            BelongsTo::make('supply', SupplyRepository::class)
+            BelongsTo::make('supply', SupplyRepository::class),
+            HasOne::make('onlineSale', OnlineSaleRepository::class)
         ];
     }
 }

@@ -15,10 +15,11 @@ class OnlineSaleRepository extends Repository
     {
         return [
             field('type')->required()->rules("string"),
-            field('username')->required()->rules("string"),
-            field('sale_id')->required()->rules("string"),
             field("updated_at")->readonly(),
-            field("created_at")->readonly()
+            field("created_at")->readonly(),
+
+            BelongsTo::make("account", AccountRepository::class),
+            BelongsTo::make("sale", SaleRepository::class)
         ];
     }
 
