@@ -30,6 +30,7 @@ export interface ModelPivots extends Record<string, unknown> {
  * The base model for all models.
  */
 export default abstract class Model<A extends ModelAttributes, R extends ModelRelations = ModelRelations, P extends ModelPivots = ModelPivots> extends BaseModel {
+  protected static pageSize: number = 1_000_000;
   protected static paginationStrategy = PaginationStrategy.PageBased;
   protected static jsonApiBaseUrl = '/api';
   protected static httpClient = new RequestHttpClient();
