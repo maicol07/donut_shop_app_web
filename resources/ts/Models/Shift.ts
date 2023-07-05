@@ -18,6 +18,7 @@ export interface ShiftRelations extends ModelRelations {
 export default class Shift extends Model<ShiftAttributes, ShiftRelations> {
   attributesNames: (keyof ShiftAttributes)[] = ['weekDay', 'startTime', 'endTime'];
   static dates = {
+    ...Model.dates,
     startTime: 'YYYY-MM-DDTHH:mm:ss.ssssssZ',
     endTime: 'YYYY-MM-DDTHH:mm:ss.ssssssZ'
   };

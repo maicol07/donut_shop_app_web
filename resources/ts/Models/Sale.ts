@@ -20,7 +20,8 @@ export interface SaleRelations extends ModelRelations {
 export default class Sale extends Model<SaleAttributes, SaleRelations> {
   attributesNames = ['date', 'shopId', 'supplyId'];
   static dates = {
-    date: 'YYYY-MM-DDTHH:mm:ss.ssssssZ',
+    ...Model.dates,
+    date: 'YYYY-MM-DDTHH:mm:ss.ssssssZ'
   };
 
   shop() {
