@@ -5,7 +5,6 @@ import Donut from '~/Models/Donut';
 export interface SupplyAttributes extends ModelAttributes {
   startDate: Date;
   endDate: Date;
-  orderNumber: string;
 }
 
 export interface SupplyRelations extends ModelRelations {
@@ -14,7 +13,7 @@ export interface SupplyRelations extends ModelRelations {
 }
 
 export default class Supply extends Model<SupplyAttributes, SupplyRelations> {
-  attributesNames = ['startDate', 'endDate', 'orderNumber'];
+  attributesNames = ['startDate', 'endDate'];
   static dates = {
     startDate: 'YYYY-MM-DDTHH:mm:ss.ssssssZ',
     endDate: 'YYYY-MM-DDTHH:mm:ss.ssssssZ',
