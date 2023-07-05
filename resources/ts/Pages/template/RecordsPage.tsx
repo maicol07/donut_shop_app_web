@@ -18,6 +18,7 @@ import {Dialog} from '@material/web/dialog/lib/dialog';
 import Form, {FormAttributes, FormSubmitEvent} from 'mithril-utilities/dist/Form';
 import {RequestError} from 'mithril-utilities';
 import {showSnackbar} from '~/utils';
+import {SaveResponse} from 'coloquent';
 
 
 
@@ -185,6 +186,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
 
     try {
       let result = await record.save();
+      await this.afterSave(record, result, event);
       if (result.getModelId()) {
         this.openDialog = false;
         void showSnackbar("Record saved successfully!");
@@ -207,6 +209,9 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
       }
     }
   }
+
+  // @ts-ignore
+  async afterSave(record: M, response: SaveResponse<M>, event: FormSubmitEvent) {}
 
   abstract saveRelations(record: M, event: FormSubmitEvent): Promise<void>;
 }
