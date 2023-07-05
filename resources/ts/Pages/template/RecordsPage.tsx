@@ -139,7 +139,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
 
   abstract tableColumns(): Collection<Child>;
 
-  attributeMap(name: keyof ModelAttributes, value: ValueOf<ModelAttributes>, record: M): unknown {
+  attributeMap<A extends keyof ModelAttributes>(name: A, value: ValueOf<ModelAttributes>, record: M): unknown {
     return match(name)
       .with(P.union("createdAt", "updatedAt"), () => (
         <span>
