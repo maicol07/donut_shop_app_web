@@ -13,7 +13,7 @@ declare module 'mithril' {
     // @ts-ignore - Type is global
   interface Attributes extends LayoutGridAttributes {
         // Needed for md-dialog
-        dialogAction?: string | 'ok' | 'discard' | 'close' | 'cancel' | 'accept' | 'decline',
+        'dialog-action'?: string | 'ok' | 'discard' | 'close' | 'cancel' | 'accept' | 'decline',
         style?: string | Partial<CSS.Properties> | Partial<CSSStyleDeclaration>,
         autoAnimate?: boolean
     }

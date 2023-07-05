@@ -4,13 +4,13 @@ import '@maicol07/material-web-additions/data-table/data-table-column.js';
 import '@maicol07/material-web-additions/data-table/data-table-row.js';
 import '@maicol07/material-web-additions/data-table/data-table-cell.js';
 import Mithril, {Child, ChildArray, Children, Vnode} from 'mithril';
-import {collect, Collection} from 'collect.js';
+import {Collection} from 'collect.js';
 import Model, {ModelAttributes} from '~/Models/Model';
 import {Class, ValueOf} from 'type-fest';
 import {match, P} from 'ts-pattern';
 import '@material/web/fab/fab.js';
 import MdIcon from '~/Components/MdIcon';
-import {mdiDelete, mdiDeleteOutline, mdiPencil, mdiPencilOutline, mdiPlus, mdiRefresh} from '@mdi/js';
+import {mdiDeleteOutline, mdiPencilOutline, mdiPlus, mdiRefresh} from '@mdi/js';
 import '@material/web/dialog/dialog.js';
 import '@material/web/button/text-button.js';
 import '@material/web/iconbutton/standard-icon-button.js';
@@ -19,7 +19,6 @@ import Form, {FormAttributes, FormSubmitEvent} from 'mithril-utilities/dist/Form
 import {RequestError} from 'mithril-utilities';
 import {showSnackbar} from '~/utils';
 import {SaveResponse} from 'coloquent';
-
 
 
 export default abstract class RecordsPage<M extends Model<any, any>> extends Page {
@@ -68,7 +67,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
           <Form id="form" state={this.formState} onsubmit={this.formSubmit.bind(this)} >
             {this.formContents()}
           </Form>
-          <md-text-button id="cancelButton" slot="footer" dialogAction="cancel"> Cancel </md-text-button>
+          <md-text-button id="cancelButton" slot="footer" dialog-action="cancel"> Cancel </md-text-button>
           <md-text-button id="saveButton" slot="footer" onclick={ (evt) => {this.element.querySelector<HTMLFormElement>("#form")?.requestSubmit() }}> Save </md-text-button>
         </md-dialog>
 
@@ -76,7 +75,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
           <span slot="header">Confirm delete</span>
           <span>Are you sure you want to delete this Record?</span>
 
-          <md-text-button id="cancelButton" slot="footer" dialogAction="cancel"> Cancel </md-text-button>
+          <md-text-button id="cancelButton" slot="footer" dialog-action="cancel"> Cancel </md-text-button>
           <md-text-button id="deleteButton" slot="footer" onclick={this.deleteRecord.bind(this)}> Delete </md-text-button>
         </md-dialog>
 
