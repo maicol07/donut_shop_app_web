@@ -9,8 +9,6 @@ import ShopSale from '~/Models/ShopSale';
 
 export interface SaleAttributes extends ModelAttributes {
   date: Date;
-  shopId: string;
-  supplyId: string;
 }
 
 export interface SaleRelations extends ModelRelations {
