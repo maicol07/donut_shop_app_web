@@ -2,9 +2,7 @@
 
 namespace App\Restify;
 
-use Illuminate\Http\Request;
 use function assert;
-
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Fields\Field;
 use Binaryk\LaravelRestify\Fields\FieldCollection;
@@ -18,15 +16,14 @@ use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Binaryk\LaravelRestify\Repositories\Repository as RestifyRepository;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
-
 use function in_array;
 use function is_array;
-
 use Nette\Utils\Json;
 
 abstract class Repository extends RestifyRepository
@@ -98,7 +95,7 @@ abstract class Repository extends RestifyRepository
         $fields = parent::collectFields($request);
         if ($request->isUpdateRequest()) {
             return $fields->map(static function (Field $field) {
-                if (!($field instanceof BelongsTo)) {
+                if (! ($field instanceof BelongsTo)) {
                     // Fix to allow updating fields with custom labels
                     $field->label = $field->attribute;
                 }
@@ -113,7 +110,7 @@ abstract class Repository extends RestifyRepository
     /**
      * Return a list with relationship for the current model.
      *
-     * @param RestifyRequest $request
+     * @param  RestifyRequest  $request
      */
     public function resolveRelationships($request): array
     {
@@ -236,7 +233,7 @@ abstract class Repository extends RestifyRepository
             $included = [];
             // Extract included from relationships and sub relationships (recursive)
             $this->extractIncluded($rel, $included);
-//            $included = array_filter(Arr::pluck($rel, 'included'));
+            //            $included = array_filter(Arr::pluck($rel, 'included'));
             // Merge all included
             foreach ($included as $key => &$value) {
                 $this->mergeIncludedRelationships($value, $key, $included);
@@ -295,11 +292,11 @@ abstract class Repository extends RestifyRepository
          * @type array<string, string|int>|array<string, array<string, array<string|int, array<string>>> $relationship
          */
         $relationships = array_map(
-        /**
-         * @param array{
-         *     data: array{type: string, id: int}|array{type: string, id: int}[]
-         * } $relationship
-         */
+            /**
+             * @param array{
+             *     data: array{type: string, id: int}|array{type: string, id: int}[]
+             * } $relationship
+             */
             static fn (array $relationship): string|int|array => Arr::get($relationship, 'data.id') ?? Arr::pluck($relationship['data'], 'pivots', 'id'),
             $relationships
         );
@@ -332,7 +329,7 @@ abstract class Repository extends RestifyRepository
                 $sync_route->setParameter('relatedRepository', $relation_name);
                 $sync_request->setRouteResolver(static fn () => $sync_route);
                 $response = app(RepositorySyncController::class)($sync_request);
-                if (!$response->isSuccessful()) {
+                if (! $response->isSuccessful()) {
                     exit($response->send());
                 }
                 // Attach request relationships
@@ -358,7 +355,7 @@ abstract class Repository extends RestifyRepository
                     $attach_route->setParameter('relatedRepository', $relation_name);
                     $attach_request->setRouteResolver(static fn () => $attach_route);
                     $response = app(RepositoryAttachController::class)($attach_request);
-                    if (!$response->isSuccessful()) {
+                    if (! $response->isSuccessful()) {
                         exit($response->send());
                     }
                 }
