@@ -12,7 +12,7 @@ export interface ShopSaleAttributes extends ModelAttributes {
 }
 
 export interface ShopSaleRelations extends ModelRelations {
-  sale: Sale[]
+  sale: Sale
 }
 
 export default class ShopSale extends Model<ShopSaleAttributes, ShopSaleRelations> {
