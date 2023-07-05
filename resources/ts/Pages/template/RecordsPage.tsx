@@ -214,4 +214,18 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
   async afterSave(record: M, response: SaveResponse<M>, event: FormSubmitEvent) {}
 
   abstract saveRelations(record: M, event: FormSubmitEvent): Promise<void>;
+
+  protected async fetchRecords<T extends Model<any, any>>(model: Class<T>, property: keyof this, withRelations: string[] = [], redraw = true) {
+    // @ts-ignore
+    if (this[property] === undefined) {
+      const response = await (model as unknown as T).query().with(withRelations).get();
+      // console.log("response", response);
+      // @ts-ignore
+      this[property] = response.getData();
+
+      if (redraw) {
+        m.redraw();
+      }
+    }
+  }
 }
