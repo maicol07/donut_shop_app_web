@@ -12,7 +12,6 @@ import {ToManyRelation} from 'coloquent/dist/relation/ToManyRelation';
 import dayjs from 'dayjs';
 
 export interface ModelAttributes {
-  id: number;
   createdAt: Date;
   updatedAt: Date;
 
@@ -44,6 +43,7 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
     createdAt: 'YYYY-MM-DDTHH:mm:ss.ssssssZ',
     updatedAt: 'YYYY-MM-DDTHH:mm:ss.ssssssZ'
   };
+
 
   protected static get jsonApiType() {
     return `${this.name.toLowerCase()}s`;
@@ -78,7 +78,7 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
   }
 
   getAttributes() {
-    return super.getAttributes() as ModelAttributes;
+    return super.getAttributes() as A;
   }
 
   setAttribute<AN extends keyof A = keyof A>(attributeName: AN, value: ValueOf<A, AN>) {
@@ -104,7 +104,7 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
     return super.getRelation(relationName as string) as ValueOf<R, RN> | undefined;
   }
 
-  setRelation<RN extends keyof R = keyof R>(relationName: RN, value: ValueOf<R, RN>) {
+  setRelation<RN extends keyof R = keyof R>(relationName: RN, value: ValueOf<R, RN> | undefined) {
     // Set related model pivots
     const rel = this.resource?.relationships?.[relationName]?.data;
     if (rel !== undefined) {
