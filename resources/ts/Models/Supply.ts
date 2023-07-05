@@ -1,8 +1,4 @@
-import Model, {
-  ModelAttributes,
-  ModelRelations
-} from '~/Models/Model';
-import Account from '~/Models/Account';
+import Model, {ModelAttributes, ModelRelations} from '~/Models/Model';
 import Company from '~/Models/Company';
 import Donut from '~/Models/Donut';
 
@@ -18,7 +14,7 @@ export interface SupplyRelations extends ModelRelations {
 }
 
 export default class Supply extends Model<SupplyAttributes, SupplyRelations> {
-  attributesNames = ['startDate', 'endDate', 'companyVatNumber'];
+  attributesNames = ['startDate', 'endDate', 'orderNumber'];
   static dates = {
     startDate: 'YYYY-MM-DDTHH:mm:ss.ssssssZ',
     endDate: 'YYYY-MM-DDTHH:mm:ss.ssssssZ',

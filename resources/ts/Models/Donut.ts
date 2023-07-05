@@ -1,7 +1,4 @@
-import Model, {
-  ModelAttributes,
-  ModelRelations
-} from '~/Models/Model';
+import Model, {ModelAttributes, ModelPivots, ModelRelations} from '~/Models/Model';
 import Ingredient from '~/Models/Ingredient';
 
 export interface DonutAttributes extends ModelAttributes {
@@ -14,7 +11,11 @@ export interface DonutRelations extends ModelRelations {
   ingredients: Ingredient[]
 }
 
-export default class Donut extends Model<DonutAttributes, DonutRelations> {
+export interface DonutPivots extends ModelPivots {
+  quantity: number; // Used with supplies (daily reservations)
+}
+
+export default class Donut extends Model<DonutAttributes, DonutRelations, DonutPivots> {
   attributesNames = ['name', 'price', 'description'];
 
   protected static get jsonApiType() {
