@@ -15,11 +15,11 @@ class ContractRepository extends Repository
     {
         return [
             field('salary')->required()->rules('numeric'),
-            field('start_date')->required()->rules('date'),
-            field('end_date')->required()->rules('date'),
+            field('start_date')->label('startDate')->required()->rules('date'),
+            field('end_date')->label('endDate')->required()->rules('date'),
             field('type')->required()->rules('string'),
-            field("created_at")->readonly(),
-            field("updated_at")->readonly()
+            field("created_at")->label('createdAt')->readonly(),
+            field("updated_at")->label('updatedAt')->readonly()
         ];
     }
 

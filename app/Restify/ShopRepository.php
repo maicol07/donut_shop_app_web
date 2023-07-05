@@ -15,8 +15,8 @@ class ShopRepository extends Repository
     {
         return [
             field('address')->required()->rules("string"),
-            field("updated_at")->readonly(),
-            field("created_at")->readonly()
+            field("updated_at")->label('createdAt')->readonly(),
+            field("created_at")->label('updatedAt')->readonly()
         ];
     }
 

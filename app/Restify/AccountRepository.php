@@ -18,10 +18,10 @@ class AccountRepository extends Repository
     {
         return [
             field('username')->required()->rules('string')->storingRules('unique:accounts,username'),
-            field('fiscal_code')->required()->rules('string')->storingRules('unique:accounts,fiscal_code'),
-            field('password')->required()->rules('string', 'min:8'),
-            field("created_at")->readonly(),
-            field("updated_at")->readonly(),
+            field('fiscal_code')->label("fiscalCode")->required()->rules('string')->storingRules('unique:accounts,fiscal_code'),
+            field('password')->required()->rules(['string', 'min:8']),
+            field("created_at")->label("createdAt")->readonly(),
+            field("updated_at")->label("updatedAt")->readonly(),
 
             BelongsTo::make('customer')
         ];

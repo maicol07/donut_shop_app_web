@@ -14,10 +14,10 @@ class ShopSaleRepository extends Repository
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('name')->required()->rules("string"),
-            field('address')->required()->rules("string"),
-            field("updated_at")->readonly(),
-            field("created_at")->readonly()
+            field("updated_at")->label('updatedAt')->readonly(),
+            field("created_at")->label('createdAt')->readonly(),
+
+            BelongsTo::make('sale', SaleRepository::class),
         ];
     }
 
