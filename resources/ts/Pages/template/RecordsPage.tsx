@@ -196,7 +196,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
       }
     } catch (exception) {
       const error = exception as RequestError<{ "message": string, "errors": Record<string, string[]> }>;
-      this.errors = error.response.errors;
+      this.errors = error.response.errors ?? {};
       m.redraw();
       void showSnackbar(error.response.message);
     }
