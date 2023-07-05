@@ -25,9 +25,11 @@ class Customer extends Model
         'birth_date' => 'datetime',
     ];
     protected $primaryKey = 'fiscal_code';
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     final public function company(): BelongsTo
     {
-        return $this->belongsTo(Company::class, ownerKey: "vat_number");
+        return $this->belongsTo(Company::class, "vat_number");
     }
 }
