@@ -9,7 +9,7 @@ import Donut from '~/Models/Donut';
 export interface SupplyAttributes extends ModelAttributes {
   startDate: Date;
   endDate: Date;
-  companyVatNumber: string;
+  orderNumber: string;
 }
 
 export interface SupplyRelations extends ModelRelations {
@@ -23,6 +23,10 @@ export default class Supply extends Model<SupplyAttributes, SupplyRelations> {
     startDate: 'YYYY-MM-DDTHH:mm:ss.ssssssZ',
     endDate: 'YYYY-MM-DDTHH:mm:ss.ssssssZ',
   };
+
+  static get jsonApiType() {
+    return 'supplies';
+  }
 
   company() {
     return this.hasOne(Company);

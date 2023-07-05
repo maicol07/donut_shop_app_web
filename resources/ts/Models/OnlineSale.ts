@@ -18,6 +18,10 @@ export interface OnlineSaleRelations extends ModelRelations {
 export default class OnlineSale extends Model<OnlineSaleAttributes, OnlineSaleRelations> {
   attributesNames = ['type', 'username'];
 
+  protected static get jsonApiType() {
+    return 'online-sales';
+  }
+
   sale() {
     return this.hasOne(Sale);
   }
