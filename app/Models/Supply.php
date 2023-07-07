@@ -26,7 +26,7 @@ class Supply extends Model
     }
 
     // Daily reservation
-    final public function dailyReservations(): BelongsToMany
+    final public function donuts(): BelongsToMany
     {
         return $this->belongsToMany(Donut::class, 'daily_reservations', 'supply_id', 'donut_id')
             ->withPivot('quantity')

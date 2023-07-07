@@ -9,7 +9,7 @@ export interface SupplyAttributes extends ModelAttributes {
 
 export interface SupplyRelations extends ModelRelations {
   company: Company,
-  dailyReservations: Donut[]
+  donuts: Donut[] // DailyReservations
 }
 
 export default class Supply extends Model<SupplyAttributes, SupplyRelations> {
@@ -27,7 +27,7 @@ export default class Supply extends Model<SupplyAttributes, SupplyRelations> {
     return this.hasOne(Company);
   }
 
-  dailyReservation(){
+  donuts(){
     return this.hasMany(Donut);
   }
 }
