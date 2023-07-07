@@ -1,8 +1,4 @@
-import {
-  Model as BaseModel,
-  PaginationStrategy,
-  PluralResponse
-} from 'coloquent';
+import {Model as BaseModel, PaginationStrategy, PluralResponse} from 'coloquent';
 import type {Class, Constructor, ValueOf} from 'type-fest';
 
 import RequestHttpClient from '~/Models/Http/RequestHttpClient';
@@ -198,5 +194,14 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
   protected hasMany<R extends Model<any>>(relatedType: Class<R>, relationName: string): ToManyRelation<R, this> {
     // @ts-ignore
     return super.hasMany(relatedType, relationName) as ToManyRelation<R, this>;
+  }
+
+  protected getAttributeAsDate(attributeName: string) {
+    // @ts-ignore
+    let attr = this.attributes.get(attributeName);
+    if (attr && dayjs(attr).isValid()) {
+      attr = super.getAttributeAsDate(attributeName);
+    }
+    return attr;
   }
 }
