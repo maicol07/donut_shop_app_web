@@ -55,7 +55,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
             <md-fab id="refresh-records" ariaLabel="Refresh" onclick={this.onRefreshRecordsButtonClicked.bind(this)}>
               <MdIcon icon={mdiRefresh} slot="icon"/>
             </md-fab>
-            <md-fab label='Add Item' onclick={ (evt) => {this.openDialog = true} }>
+            <md-fab label='Add Item' onclick={this.openAddDialog.bind(this)}>
               <MdIcon slot="icon" icon={mdiPlus}/>
             </md-fab>
           </div>
@@ -81,6 +81,18 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
 
       </>
     );
+  }
+
+  openAddDialog(){
+    for (const key in this.formState) {
+      if (this.formState instanceof Map) {
+        this.formState.get(key)?.('')
+      } else {
+        this.formState[key]('')
+      }
+    }
+    this.errors = {};
+    this.openDialog = true;
   }
 
   async deleteRecord(){
@@ -197,6 +209,9 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
       }
     } catch (exception) {
       const error = exception as RequestError<{ "message": string, "errors": Record<string, string[]> }>;
+      if (error.response === undefined) { // Not a request error
+        throw exception;
+      }
       this.errors = error.response.errors ?? {};
       m.redraw();
       void showSnackbar(error.response.message);
