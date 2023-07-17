@@ -38,7 +38,7 @@ export default class Ingredients extends RecordsPage<Ingredient> {
       <div style={{display: 'flex', flexDirection: 'column', gap: '6px'}}>
         <md-filled-text-field name="name" label="Name" error-text={this.errors.name?.[0]} error={'name' in this.errors} />
         <label style={{display: 'flex', alignItems: 'center'}}>
-          <md-checkbox name="allergen" onchange={(event) => this.formState.allergen((event.target as Checkbox).checked)}></md-checkbox>
+          <md-checkbox name="allergen" checked={this.formState.allergen()} onchange={(event) => this.formState.allergen((event.target as Checkbox).checked)}></md-checkbox>
           Is Allergen?
         </label>
       </div>
