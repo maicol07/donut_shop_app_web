@@ -5,8 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class Contract extends Model
 {
@@ -24,16 +22,16 @@ class Contract extends Model
 
     final public function shifts(): HasMany
     {
-        return $this->hasMany(Shift::class,"contract_id", "id");
+        return $this->hasMany(Shift::class, 'contract_id', 'id');
     }
 
     final public function employee(): BelongsToMany
     {
-        return $this->belongsToMany(Employee::class, "employee_assignments");
+        return $this->belongsToMany(Employee::class, 'employee_assignments', relatedPivotKey: 'fiscal_code', relatedKey: 'fiscal_code');
     }
 
     final public function shops(): BelongsToMany
     {
-        return $this->belongsToMany(Shop::class, "employee_assignments");
+        return $this->belongsToMany(Shop::class, 'employee_assignments');
     }
 }
