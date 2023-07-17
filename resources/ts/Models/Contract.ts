@@ -1,7 +1,4 @@
-import Model, {
-  ModelAttributes,
-  ModelRelations
-} from '~/Models/Model';
+import Model, {ModelAttributes, ModelRelations} from '~/Models/Model';
 import Employee from '~/Models/Employee';
 import Shop from '~/Models/Shop';
 import Shift from '~/Models/Shift';
@@ -22,6 +19,7 @@ export interface ContractRelations extends ModelRelations {
 export default class Contract extends Model<ContractAttributes, ContractRelations> {
   attributesNames = ['salary', 'startDate', 'endDate', 'type'];
   static dates = {
+    ...Model.dates,
     startDate: 'YYYY-MM-DDTHH:mm:ss.ssssssZ',
     endDate: 'YYYY-MM-DDTHH:mm:ss.ssssssZ'
   };
