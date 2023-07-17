@@ -12,6 +12,7 @@ import '@material/web/checkbox/checkbox.js';
 import DataTableColumn from '~/Components/DataTableColumn';
 import {FormSubmitEvent} from 'mithril-utilities/dist/Form';
 import {DataTable} from '@maicol07/material-web-additions/data-table/lib/data-table';
+import {SaveResponse} from 'coloquent';
 
 
 export default class Donuts extends RecordsPage<Donut> {
@@ -93,6 +94,13 @@ export default class Donuts extends RecordsPage<Donut> {
   }
 
   async saveRelations(record: Donut, event: FormSubmitEvent) {
+
+  }
+
+  // @ts-ignore
+  async afterSave(record: Donut, response: SaveResponse<Donut>, event: FormSubmitEvent): Promise<void> {
+    await super.afterSave(record, response, event);
+
     const form = event.target as HTMLFormElement;
     const datatable = form.querySelector<DataTable>('md-data-table');
     const ids = datatable!.rows.filter((row)=> row.selected).map((row) => row.dataset.recordId)
@@ -103,7 +111,9 @@ export default class Donuts extends RecordsPage<Donut> {
       const absoluteQuantity = form.querySelector<HTMLInputElement>(`[name="${absoluteQuantityName}"]`)!.value as unknown as number;
       ingredient.setPivot('absolute_quantity', absoluteQuantity);
       return ingredient;
-    }))
+    }));
+
+    await record.save();
   }
 }
 
