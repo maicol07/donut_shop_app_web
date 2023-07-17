@@ -10,17 +10,19 @@ use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 class SaleRepository extends Repository
 {
     public static string $model = Sale::class;
+
     public static bool|array $public = true;
 
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('date')->required()->rules("date"),
-            field("updated_at")->readonly(),
-            field("created_at")->readonly(),
+            field('date')->required()->rules('date'),
+            field('shop_id')->rules(['nullable', 'numeric']),
+            field('created_at')->label('createdAt')->readonly(),
+            field('updated_at')->label('updatedAt')->readonly(),
 
             BelongsTo::make('shop', ShopRepository::class),
-            BelongsTo::make('supply', SupplyRepository::class)
+            BelongsTo::make('supply', SupplyRepository::class),
         ];
     }
 
@@ -29,7 +31,7 @@ class SaleRepository extends Repository
         return [
             BelongsTo::make('shop', ShopRepository::class),
             BelongsTo::make('supply', SupplyRepository::class),
-            HasOne::make('onlineSale', OnlineSaleRepository::class)
+            HasOne::make('onlineSale', OnlineSaleRepository::class),
         ];
     }
 }

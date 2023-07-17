@@ -10,7 +10,6 @@ class EmployeeRepository extends Repository
 {
     public static string $model = Employee::class;
 
-
     public function fields(RestifyRequest $request): array
     {
         return [
@@ -35,11 +34,11 @@ class EmployeeRepository extends Repository
     public static function related(): array
     {
         return [
-            BelongsToMany::make('contracts')->withPivot(
+            BelongsToMany::make('contracts', ContractRepository::class)->withPivot(
                 field('created_at')->label('createdAt')->readonly(),
                 field('updated_at')->label('updatedAt')->readonly()
             ),
-            BelongsToMany::make('shops')
+            BelongsToMany::make('shops', ShopRepository::class),
         ];
     }
 }

@@ -13,11 +13,11 @@ class DiscountRepository extends Repository
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('discount_name')->required()->rules('string'),
-            field('start_date')->required()->rules('date'),
-            field('end_date')->required()->rules('date'),
-            field('created_at')->readonly(),
-            field('updated_at')->readonly(),
+            field('discount_name')->label('discountName')->required()->rules('string'),
+            field('start_date')->label('startDate')->required()->rules('date'),
+            field('end_date')->label('endDate')->required()->rules('date'),
+            field('created_at')->label('createdAt')->readonly(),
+            field('updated_at')->label('updatedAt')->readonly(),
         ];
     }
 
@@ -26,8 +26,8 @@ class DiscountRepository extends Repository
         return [
             BelongsToMany::make('donuts')->withPivot(
                 field('absolute_quantity')->required()->rules('numeric'),
-                field('created_at')->readonly(),
-                field('updated_at')->readonly(),
+                field('created_at')->label('createdAt')->readonly(),
+                field('updated_at')->label('updatedAt')->readonly(),
             ),
         ];
     }

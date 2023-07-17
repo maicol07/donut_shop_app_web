@@ -11,6 +11,7 @@ class CustomerRepository extends Repository
     public static string $model = Customer::class;
 
     public static string $id = 'fiscal_code';
+
     public static string $keyType = 'string';
 
     public function fields(RestifyRequest $request): array
@@ -26,17 +27,17 @@ class CustomerRepository extends Repository
             field('city')->required()->rules('string'),
             field('province')->required()->rules('string'),
             field('email')->required()->rules('email'),
-            field("created_at")->label('createdAt')->readonly(),
-            field("updated_at")->label('updatedAt')->readonly(),
+            field('created_at')->label('createdAt')->readonly(),
+            field('updated_at')->label('updatedAt')->readonly(),
 
-            BelongsTo::make('company', CompanyRepository::class)
+            BelongsTo::make('company', CompanyRepository::class),
         ];
     }
 
     public static function related(): array
     {
         return [
-            BelongsTo::make('company', CompanyRepository::class)
+            BelongsTo::make('company', CompanyRepository::class),
         ];
     }
 }

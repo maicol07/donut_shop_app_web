@@ -9,14 +9,15 @@ use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 class ShopRepository extends Repository
 {
     public static string $model = Shop::class;
+
     public static bool|array $public = true;
 
     public function fields(RestifyRequest $request): array
     {
         return [
-            field('address')->required()->rules("string"),
-            field("updated_at")->label('createdAt')->readonly(),
-            field("created_at")->label('updatedAt')->readonly()
+            field('address')->required()->rules('string'),
+            field('updated_at')->label('createdAt')->readonly(),
+            field('created_at')->label('updatedAt')->readonly(),
         ];
     }
 
@@ -24,23 +25,20 @@ class ShopRepository extends Repository
     {
         return [
             BelongsToMany::make('employees', EmployeeRepository::class)->withPivot(
-                field("fiscal_code")->required()->rules('string'),
-                field("created_at")->readonly(),
-                field("updated_at")->readonly(),
+                field('fiscal_code')->required()->rules('string'),
+                field('created_at')->label('createdAt')->readonly(),
+                field('updated_at')->label('updatedAt')->readonly(),
             ),
             BelongsToMany::make('contracts', ContractRepository::class)->withPivot(
-                field("created_at")->readonly(),
-                field("updated_at")->readonly(),
+                field('created_at')->label('createdAt')->readonly(),
+                field('updated_at')->label('updatedAt')->readonly(),
             ),
             BelongsToMany::make('availabilities', DonutRepository::class)->withPivot(
-                field("quantity")->required()->rules('numeric'),
-                field("created_at")->readonly(),
-                field("updated_at")->readonly(),
+                field('quantity')->required()->rules('numeric'),
+                field('created_at')->label('createdAt')->readonly(),
+                field('updated_at')->label('updatedAt')->readonly(),
             ),
-            BelongsToMany::make('warehouses', WarehouseRepository::class)->withPivot(
-                field("created_at")->readonly(),
-                field("updated_at")->readonly(),
-            ),
+            BelongsToMany::make('warehouses', WarehouseRepository::class),
         ];
     }
 }

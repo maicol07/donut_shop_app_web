@@ -18,8 +18,8 @@ class SupplyRepository extends Repository
         return [
             field('start_date')->label('startDate')->required()->rules('date'),
             field('end_date')->label('endDate')->required()->rules('date'),
-            field('updated_at')->readonly(),
-            field('created_at')->readonly(),
+            field('created_at')->label('createdAt')->readonly(),
+            field('updated_at')->label('updatedAt')->readonly(),
 
             BelongsTo::make('company', CompanyRepository::class),
         ];
@@ -30,9 +30,7 @@ class SupplyRepository extends Repository
         return [
             BelongsTo::make('company', CompanyRepository::class),
             BelongsToMany::make('donuts', DonutRepository::class)->withPivot(
-                field('quantity')->required()->rules('numeric'),
-                field('created_at')->readonly(),
-                field('updated_at')->readonly(),
+                field('quantity')->required()->rules('numeric')
             ),
         ];
     }
