@@ -12,7 +12,7 @@ export interface ContractAttributes extends ModelAttributes {
 
 export interface ContractRelations extends ModelRelations {
   shifts: Shift[],
-  employee: Employee,
+  employee: Employee[],
   shops: Shop[]
 }
 
@@ -28,9 +28,9 @@ export default class Contract extends Model<ContractAttributes, ContractRelation
     return this.hasMany(Shop);
   }
   employee(){
-    return this.hasOne(Employee)
+    return this.hasMany(Employee)
   }
   shifts(){
-    this.hasMany(Shift)
+    return this.hasMany(Shift)
   }
 }

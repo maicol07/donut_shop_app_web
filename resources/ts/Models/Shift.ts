@@ -1,8 +1,4 @@
-import Model, {
-  ModelAttributes,
-  ModelRelations
-} from '~/Models/Model';
-import Company from '~/Models/Company';
+import Model, {ModelAttributes, ModelRelations} from '~/Models/Model';
 import Contract from '~/Models/Contract';
 
 export interface ShiftAttributes extends ModelAttributes {
@@ -12,7 +8,7 @@ export interface ShiftAttributes extends ModelAttributes {
 }
 
 export interface ShiftRelations extends ModelRelations {
-  contract: Contract[]
+  contract: Contract
 }
 
 export default class Shift extends Model<ShiftAttributes, ShiftRelations> {
