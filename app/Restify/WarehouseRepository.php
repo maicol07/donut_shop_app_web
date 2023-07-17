@@ -25,11 +25,11 @@ class WarehouseRepository extends Repository
     public static function related(): array
     {
         return [
-            BelongsToMany::make('shops')->withPivot(
-                field('created_at')->readonly(),
-                field('updated_at')->readonly(),
+            BelongsToMany::make('shops', ShopRepository::class)->withPivot(
+                field('created_at')->label('createdAt')->readonly(),
+                field('updated_at')->label('updatedAt')->readonly(),
             ),
-            BelongsToMany::make('ingredients')->withPivot(
+            BelongsToMany::make('ingredients', IngredientRepository::class)->withPivot(
                 field('quantity')->required()->rules('numeric'),
                 field('created_at')->label('createdAt')->readonly(),
                 field('updated_at')->label('updatedAt')->readonly(),

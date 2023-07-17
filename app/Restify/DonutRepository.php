@@ -24,10 +24,10 @@ class DonutRepository extends Repository
     public static function related(): array
     {
         return [
-            BelongsToMany::make('ingredients')->withPivot(
+            BelongsToMany::make('ingredients', IngredientRepository::class)->withPivot(
                 field('absolute_quantity')->required()->rules('numeric')
             ),
-            BelongsToMany::make('discounts')->withPivot(
+            BelongsToMany::make('discounts', DiscountRepository::class)->withPivot(
                 field('quantity')->required()->rules('numeric'),
                 field('percentage_discount')->required()->rules('numeric')
             ),

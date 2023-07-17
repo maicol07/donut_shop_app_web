@@ -25,12 +25,12 @@ class IngredientRepository extends Repository
     public static function related(): array
     {
         return [
-            BelongsToMany::make('donuts')->withPivot(
+            BelongsToMany::make('donuts', DonutRepository::class)->withPivot(
                 field('absolute_quantity')->required()->rules('numeric'),
                 field('created_at')->label('createdAt')->readonly(),
                 field('updated_at')->label('updatedAt')->readonly(),
             ),
-            BelongsToMany::make('warehouses')->withPivot(
+            BelongsToMany::make('warehouses', WarehouseRepository::class)->withPivot(
                 field('quantity')->required()->rules('numeric'),
                 field('created_at')->label('createdAt')->readonly(),
                 field('updated_at')->label('updatedAt')->readonly(),

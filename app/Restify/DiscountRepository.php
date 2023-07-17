@@ -24,7 +24,7 @@ class DiscountRepository extends Repository
     public static function related(): array
     {
         return [
-            BelongsToMany::make('donuts')->withPivot(
+            BelongsToMany::make('donuts', DonutRepository::class)->withPivot(
                 field('absolute_quantity')->required()->rules('numeric'),
                 field('created_at')->label('createdAt')->readonly(),
                 field('updated_at')->label('updatedAt')->readonly(),
