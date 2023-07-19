@@ -23,6 +23,7 @@
         "phpunit/phpunit": "^10.0",
         "roave/security-advisories": "dev-latest",
         "spatie/laravel-ignition": "^2.0",
+        "spatie/laravel-web-tinker": "^1.8",
         "tightenco/ziggy": "^1"
     },
     "autoload": {
