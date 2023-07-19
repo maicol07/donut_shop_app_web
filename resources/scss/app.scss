@@ -46,10 +46,11 @@ md-navigation-drawer, md-navigation-drawer-modal {
 
 }
 
-
 md-icon svg {
-    width: var(--_with-icon-icon-size, var(--_icon-size, var(--_size)));
-    height: var(--_with-icon-icon-size, var(--_icon-size, var(--_size)));
+    width: var(--_icon-size, var(--_size));
+    height: var(--_icon-size, var(--_size));
+    //width: var(--_with-icon-icon-size, var(--_icon-size, var(--_size)));
+    //height: var(--_with-icon-icon-size, var(--_icon-size, var(--_size)));
     line-height: 0;
 }
 
