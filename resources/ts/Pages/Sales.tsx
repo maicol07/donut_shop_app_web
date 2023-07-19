@@ -42,7 +42,7 @@ export default class Sales extends RecordsPage<Sale> {
   shops: Shop[] | undefined;
   accounts: Account[] | undefined;
   donuts: Donut[] | undefined;
-  with = ['shop', 'supply', 'onlineSale', 'onlineSale.account', 'shopSale', 'donuts'];
+  with = ['shop', 'supply', 'onlineSale', 'onlineSale.account', 'onlineSale.account.customer', 'shopSale', 'donuts'];
 
   async oninit(vnode: Mithril.Vnode<PageAttributes, this>): Promise<void> {
     await super.oninit(vnode);
@@ -84,7 +84,12 @@ export default class Sales extends RecordsPage<Sale> {
       })
       .with("type", () => record.getRelation('onlineSale') ? 'online' : 'store')
       .with("deliveryType", () => record.getRelation('onlineSale')?.getAttribute('type'))
-      .with("username", () => record.getRelation('onlineSale')?.getRelation('account')?.getAttribute('username'))
+      .with("username", () => {
+        const account = record.getRelation('onlineSale')?.getRelation('account');
+        if (!account) return '';
+        const customer = account.getRelation('customer');
+        return `${account.getAttribute('username')} (${customer?.getAttribute('name')} ${customer?.getAttribute('surname')})`;
+      })
       .otherwise(() => super.attributeMap(name, value, record));
   }
 
