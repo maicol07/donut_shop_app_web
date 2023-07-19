@@ -79,7 +79,8 @@ export default class Sales extends RecordsPage<Sale> {
       .with("shop", () => record.getRelation('shop')?.getAttribute('address'))
       .with("supply", () => {
         const supply = record.getRelation('supply');
-        return `${supply?.getId()} (${dayjs(supply?.getAttribute('startDate')).format('DD/MM/YYYY')} - ${dayjs(supply?.getAttribute('endDate')).format('DD/MM/YYYY')})`;
+        if (!supply) return '';
+        return `${supply.getId()} (${dayjs(supply.getAttribute('startDate')).format('DD/MM/YYYY')} - ${dayjs(supply.getAttribute('endDate')).format('DD/MM/YYYY')})`;
       })
       .with("type", () => record.getRelation('onlineSale') ? 'online' : 'store')
       .with("deliveryType", () => record.getRelation('onlineSale')?.getAttribute('type'))
