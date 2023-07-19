@@ -40,9 +40,15 @@ export default class Donuts extends RecordsPage<Donut> {
   attributeMap(name: keyof DonutAttributes, value: ValueOf<DonutAttributes>, record: Donut) {
     return match(name)
       .with('ingredients', () => {
-        return record.getRelation('ingredients')
-          ?.map((ingredient) => `${ingredient.getAttribute("name")} (${ingredient.getPivot('absolute_quantity')})`)
-          .join(", ");
+        return m.trust(record.getRelation('ingredients')
+          ?.map((ingredient) => {
+            let name = ingredient.getAttribute('name');
+            if (ingredient.getAttribute('allergen')) {
+              name = `<span style="font-weight: bold">${name}</span>`;
+            }
+            return `${name} (${ingredient.getPivot('absolute_quantity')})`
+          })
+          .join(", ") ?? '');
       })
       .otherwise(() => super.attributeMap(name, value, record));
   }
