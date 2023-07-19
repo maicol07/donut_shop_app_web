@@ -1,9 +1,4 @@
-import Model, {
-  ModelAttributes,
-  ModelRelations
-} from '~/Models/Model';
-import Company from '~/Models/Company';
-import Contract from '~/Models/Contract';
+import Model, {ModelAttributes, ModelRelations} from '~/Models/Model';
 import Sale from '~/Models/Sale';
 
 export interface ShopSaleAttributes extends ModelAttributes {
@@ -17,6 +12,10 @@ export interface ShopSaleRelations extends ModelRelations {
 
 export default class ShopSale extends Model<ShopSaleAttributes, ShopSaleRelations> {
   attributesNames: (keyof ShopSaleAttributes)[] = ['name', 'address'];
+
+  protected static get jsonApiType() {
+    return 'shop-sales';
+  }
 
   sale() {
     return this.hasOne(Sale);
