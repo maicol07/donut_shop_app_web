@@ -170,7 +170,11 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
     for (const record of this.records) {
       rows.push(
         <md-data-table-row>
-          {this.tableColumns().keys().map((attribute)=> <md-data-table-cell>{this.attributeMap(attribute, record.getAttribute(attribute), record)}</md-data-table-cell>).toArray()}
+          {this.tableColumns().keys().map((attribute) => (
+            <md-data-table-cell>
+              {this.attributeMap(attribute, record.getAttribute(attribute), record)}
+            </md-data-table-cell>
+          )).toArray()}
 
           {/*edit and delete buttons*/ }
           <md-data-table-cell>
