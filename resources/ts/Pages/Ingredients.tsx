@@ -9,6 +9,7 @@ import '@material/web/textfield/filled-text-field.js';
 import '@material/web/checkbox/checkbox.js';
 import {Checkbox} from '@material/web/checkbox/lib/checkbox';
 import DataTableColumn from '~/Components/DataTableColumn';
+import {FormSubmitEvent} from 'mithril-utilities/dist/Form';
 
 
 export default class Ingredients extends RecordsPage<Ingredient> {
@@ -43,6 +44,11 @@ export default class Ingredients extends RecordsPage<Ingredient> {
         </label>
       </div>
     )
+  }
+
+  async saveAttributes(record: Ingredient, event: FormSubmitEvent): Promise<void> {
+    await super.saveAttributes(record, event);
+    record.setAttribute('allergen', Boolean(this.formState.allergen()));
   }
 
   saveRelations(record: Ingredient): Promise<void> {
