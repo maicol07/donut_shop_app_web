@@ -20,6 +20,7 @@ import {FilledSelect} from '@material/web/select/lib/filled-select';
 import dayjs from 'dayjs';
 import {mdiDeleteOutline, mdiPlus} from '@mdi/js';
 import MdIcon from '~/Components/MdIcon';
+import customParseFormat from 'dayjs/esm/plugin/customParseFormat'
 
 
 export default class Contracts extends RecordsPage<Contract> {
@@ -32,9 +33,9 @@ export default class Contracts extends RecordsPage<Contract> {
     type: Stream(''),
     shop: Stream('')
   }
-  employees: Employee[]|undefined;
+  employees: Employee[] | undefined;
   shifts: Shift[] = [];
-  shops: Shop[]|undefined;
+  shops: Shop[] | undefined;
   // @ts-ignore
   with = ['shifts', 'employee', 'shops'];
 
@@ -64,10 +65,10 @@ export default class Contracts extends RecordsPage<Contract> {
         ?.map((employee) => `${employee.getAttribute('firstName')} ${employee.getAttribute('lastName')}`
         )
         .join(', '))
-      .with('shops',() => record.getRelation('shops')
+      .with('shops', () => record.getRelation('shops')
         ?.map((shop) => `${shop.getAttribute('address')}`)
         .join(', '))
-      .with('shifts',() => record.getRelation('shifts')
+      .with('shifts', () => record.getRelation('shifts')
         ?.map((shift) => `${shift.getAttribute('weekDay')}: ${dayjs(shift.getAttribute('startTime')).format('HH:mm')} - ${dayjs(shift.getAttribute('endTime')).format('HH:mm')}`)
         .join(', '))
       .with(P.union("startDate", "endDate"), () => ((value as Date).toLocaleString()))
@@ -80,19 +81,26 @@ export default class Contracts extends RecordsPage<Contract> {
         <md-filled-select name="fiscalCode" label="Employee">
           {this.employees?.map((employee) => {
               return (
-                <md-select-option value={employee.getAttribute('fiscalCode')} headline={employee.getAttribute('firstName') + ' ' + employee.getAttribute('lastName')} selected={this.formState.fiscalCode() === employee.getAttribute('fiscalCode')}></md-select-option>
+                <md-select-option value={employee.getAttribute('fiscalCode')}
+                                  headline={employee.getAttribute('firstName') + ' ' + employee.getAttribute('lastName')}
+                                  selected={this.formState.fiscalCode() === employee.getAttribute('fiscalCode')}></md-select-option>
               )
             }
           )}
         </md-filled-select>
-        <md-filled-text-field name="salary" label="salary" type="number" error-text={this.errors.salary?.[0]} error={'salary' in this.errors}/>
-        <md-filled-text-field name="startDate" type="date" label="Start Date" error-text={this.errors.startDate?.[0]} error={'startDate' in this.errors}/>
-        <md-filled-text-field name="endDate" type="date" label="End Date" error-text={this.errors.endDate?.[0]} error={'endDate' in this.errors}/>
-        <md-filled-text-field name="type" label="Type" error-text={this.errors.type?.[0]} error={'type' in this.errors}/>
+        <md-filled-text-field name="salary" label="salary" type="number" error-text={this.errors.salary?.[0]}
+                              error={'salary' in this.errors}/>
+        <md-filled-text-field name="startDate" type="date" label="Start Date" error-text={this.errors.startDate?.[0]}
+                              error={'startDate' in this.errors}/>
+        <md-filled-text-field name="endDate" type="date" label="End Date" error-text={this.errors.endDate?.[0]}
+                              error={'endDate' in this.errors}/>
+        <md-filled-text-field name="type" label="Type" error-text={this.errors.type?.[0]}
+                              error={'type' in this.errors}/>
         <md-filled-select name="shop" label="Shop">
           {this.shops?.map((shop) => {
               return (
-                <md-select-option value={shop.getId()} headline={shop.getAttribute('address')} selected={this.formState.shop() === shop.getId()}></md-select-option>
+                <md-select-option value={shop.getId()} headline={shop.getAttribute('address')}
+                                  selected={this.formState.shop() === shop.getId()}></md-select-option>
               )
             }
           )}
@@ -101,28 +109,38 @@ export default class Contracts extends RecordsPage<Contract> {
           <strong>Shifts</strong>
           {this.shifts?.map((shift) => {
               return (
-                <div id={shift} style={{display: 'flex', gap: '6px', alignItems: 'center'}} oninput={this.setShiftAttribute.bind(this,shift)}>
+                <div id={shift} style={{display: 'flex', gap: '6px', alignItems: 'center'}}
+                     oninput={this.setShiftAttribute.bind(this, shift)}>
                   <md-filled-select name="weekDay" label="Week Day" style={{minHeight: '58px'}}>
-                    <md-select-option value='monday' headline="Monday" selected={shift.getAttribute('weekDay') == 'monday'}></md-select-option>
-                    <md-select-option value='tuesday' headline="Tuesday" selected={shift.getAttribute('weekDay') == 'tuesday'}></md-select-option>
-                    <md-select-option value='wednesday' headline="Wednesday" selected={shift.getAttribute('weekDay') == 'wednesday'}></md-select-option>
-                    <md-select-option value='thursday' headline="Thursday" selected={shift.getAttribute('weekDay') == 'thursday'}></md-select-option>
-                    <md-select-option value='friday' headline="Friday" selected={shift.getAttribute('weekDay') == 'friday'}></md-select-option>
-                    <md-select-option value='saturday' headline="Saturday" selected={shift.getAttribute('weekDay') == 'saturday'}></md-select-option>
-                    <md-select-option value='sunday' headline="Sunday" selected={shift.getAttribute('weekDay') == 'sunday'}></md-select-option>
+                    <md-select-option value="monday" headline="Monday"
+                                      selected={shift.getAttribute('weekDay') == 'monday'}></md-select-option>
+                    <md-select-option value="tuesday" headline="Tuesday"
+                                      selected={shift.getAttribute('weekDay') == 'tuesday'}></md-select-option>
+                    <md-select-option value="wednesday" headline="Wednesday"
+                                      selected={shift.getAttribute('weekDay') == 'wednesday'}></md-select-option>
+                    <md-select-option value="thursday" headline="Thursday"
+                                      selected={shift.getAttribute('weekDay') == 'thursday'}></md-select-option>
+                    <md-select-option value="friday" headline="Friday"
+                                      selected={shift.getAttribute('weekDay') == 'friday'}></md-select-option>
+                    <md-select-option value="saturday" headline="Saturday"
+                                      selected={shift.getAttribute('weekDay') == 'saturday'}></md-select-option>
+                    <md-select-option value="sunday" headline="Sunday"
+                                      selected={shift.getAttribute('weekDay') == 'sunday'}></md-select-option>
                   </md-filled-select>
-                  <md-filled-text-field name="startTime" label="Start Time" type="time" value={shift.getAttribute('startTime') ? dayjs(shift.getAttribute('startTime')).format('HH:mm') : ''}/>
-                  <md-filled-text-field name="endTime" label="End Time" type="time" value={shift.getAttribute('endTime') ? dayjs(shift.getAttribute('endTime')).format('HH:mm') : ''} />
-                  <md-standard-icon-button onclick={ () =>
-                    {
-                      this.shifts = this.shifts.filter((filtro) => filtro != shift);
-                    }
+                  <md-filled-text-field name="startTime" label="Start Time" type="time"
+                                        value={shift.getAttribute('startTime') ? dayjs(shift.getAttribute('startTime')).format('HH:mm') : ''}/>
+                  <md-filled-text-field name="endTime" label="End Time" type="time"
+                                        value={shift.getAttribute('endTime') ? dayjs(shift.getAttribute('endTime')).format('HH:mm') : ''}/>
+                  <md-standard-icon-button onclick={() => {
+                    this.shifts = this.shifts.filter((filtro) => filtro != shift);
+                  }
                   }><MdIcon icon={mdiDeleteOutline}/></md-standard-icon-button>
                 </div>
               )
             }
           )}<br/>
-          <md-text-button onclick={this.addShift.bind(this)} ><MdIcon slot='icon' icon={mdiPlus}/>Add a shift</md-text-button>
+          <md-text-button onclick={this.addShift.bind(this)}><MdIcon slot="icon" icon={mdiPlus}/>Add a shift
+          </md-text-button>
         </div>
       </div>
     )
@@ -142,11 +160,14 @@ export default class Contracts extends RecordsPage<Contract> {
     this.shifts = record.getRelation('shifts')!;
   }
 
-  setShiftAttribute(shift: Shift, e:Event){
-    shift.setAttribute((e.target as FilledTextField|FilledSelect).getAttribute('name')!, (e.target as FilledTextField|FilledSelect).value)
+  setShiftAttribute(shift: Shift, e: InputEvent) {
+    dayjs.extend(customParseFormat);
+    const value = (e.target as FilledTextField | FilledSelect).value;
+    const valueAsDate = dayjs(value, 'HH:mm');
+    shift.setAttribute((e.target as FilledTextField | FilledSelect).getAttribute('name')!, valueAsDate.isValid() ? dayjs(value, "HH:mm").toDate() : value)
   }
 
-  addShift(){
+  addShift() {
     let shift = new Shift();
     this.shifts.push(shift)
   }
