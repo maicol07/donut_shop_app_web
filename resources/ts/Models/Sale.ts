@@ -1,11 +1,9 @@
-import Model, {
-  ModelAttributes,
-  ModelRelations
-} from '~/Models/Model';
+import Model, {ModelAttributes, ModelRelations} from '~/Models/Model';
 import Shop from '~/Models/Shop';
 import Supply from '~/Models/Supply';
 import OnlineSale from '~/Models/OnlineSale';
 import ShopSale from '~/Models/ShopSale';
+import Donut from '~/Models/Donut';
 
 export interface SaleAttributes extends ModelAttributes {
   date: Date;
@@ -16,6 +14,7 @@ export interface SaleRelations extends ModelRelations {
   supply: Supply;
   onlineSale: OnlineSale;
   shopSale: ShopSale;
+  donuts: Donut[];
 }
 
 export default class Sale extends Model<SaleAttributes, SaleRelations> {
@@ -39,5 +38,9 @@ export default class Sale extends Model<SaleAttributes, SaleRelations> {
 
   shopSale() {
     return this.hasOne(ShopSale);
+  }
+
+  donuts() {
+    return this.hasMany(Donut);
   }
 }

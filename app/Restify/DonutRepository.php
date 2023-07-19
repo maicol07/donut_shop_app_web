@@ -34,6 +34,9 @@ class DonutRepository extends Repository
             BelongsToMany::make('availability', ShopRepository::class)->withPivot(
                 field('quantity')->required()->rules('numeric')
             ),
+            BelongsToMany::make('sales', SaleRepository::class)->withPivot(
+                field('quantity')->required()->rules('numeric')
+            ),
         ];
     }
 }

@@ -1,5 +1,6 @@
 import Model, {ModelAttributes, ModelPivots, ModelRelations} from '~/Models/Model';
 import Ingredient from '~/Models/Ingredient';
+import Sale from '~/Models/Sale';
 
 export interface DonutAttributes extends ModelAttributes {
   name: string;
@@ -8,11 +9,12 @@ export interface DonutAttributes extends ModelAttributes {
 }
 
 export interface DonutRelations extends ModelRelations {
-  ingredients: Ingredient[]
+  ingredients: Ingredient[];
+  sales: Sale[];
 }
 
 export interface DonutPivots extends ModelPivots {
-  quantity: number; // Used with supplies (daily reservations)
+  quantity: number; // Used with supplies (daily reservations) and sales (purchases)
 }
 
 export default class Donut extends Model<DonutAttributes, DonutRelations, DonutPivots> {
@@ -24,5 +26,9 @@ export default class Donut extends Model<DonutAttributes, DonutRelations, DonutP
 
   ingredients() {
     return this.hasMany(Ingredient);
+  }
+
+  sales() {
+    return this.hasMany(Sale);
   }
 }

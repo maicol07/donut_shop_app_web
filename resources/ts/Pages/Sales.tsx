@@ -23,6 +23,8 @@ import {showSnackbar} from '~/utils';
 import {OutlinedSegmentedButtonSet} from '@material/web/labs/segmentedbuttonset/lib/outlined-segmented-button-set';
 import {SaveResponse} from 'coloquent';
 import ShopSale from '~/Models/ShopSale';
+import Donut from '~/Models/Donut';
+import {DataTable} from '@maicol07/material-web-additions/data-table/lib/data-table';
 
 export default class Sales extends RecordsPage<Sale> {
   modelType = Sale;
@@ -39,13 +41,15 @@ export default class Sales extends RecordsPage<Sale> {
   supplies: Supply[] | undefined;
   shops: Shop[] | undefined;
   accounts: Account[] | undefined;
-  with = ['shop', 'supply', 'onlineSale', 'onlineSale.account', 'shopSale'];
+  donuts: Donut[] | undefined;
+  with = ['shop', 'supply', 'onlineSale', 'onlineSale.account', 'shopSale', 'donuts'];
 
   async oninit(vnode: Mithril.Vnode<PageAttributes, this>): Promise<void> {
     await super.oninit(vnode);
     await this.fetchRecords(Supply, 'supplies');
     await this.fetchRecords(Account, 'accounts');
     await this.fetchRecords(Shop, 'shops');
+    await this.fetchRecords(Donut, 'donuts');
   }
 
   tableColumns(): Collection<Child> {
@@ -151,6 +155,32 @@ export default class Sales extends RecordsPage<Sale> {
                               headline={supply.getId()}></md-select-option>
           ))}
         </md-filled-select>
+        <h2>Products purchased</h2>
+        <md-data-table>
+          <md-data-table-column type="checkbox"></md-data-table-column>
+          <md-data-table-column filterable sortable>Donut</md-data-table-column>
+          <md-data-table-column>Quantity</md-data-table-column>
+          {this.donuts?.map((donut) => {
+            const relationDonut = this.selectedRecord?.getRelation('donuts')?.find((relationDonut) => relationDonut.getId() === donut.getId());
+            const quantityName = `quantity_${donut.getId()}`;
+            return (
+              <md-data-table-row data-relation="donuts" data-record-id={donut.getId()} selected={relationDonut !== undefined}>
+                <md-data-table-cell type="checkbox"></md-data-table-cell>
+                <md-data-table-cell>
+                  {donut.getAttribute('name')}
+                </md-data-table-cell>
+                <md-data-table-cell>
+                  <md-outlined-text-field
+                    style={{"--md-outlined-text-field-container-padding-vertical": "6px"}}
+                    name={quantityName}
+                    label="Quantity"
+                    type="number"
+                    value={relationDonut?.getPivot('quantity') as unknown as string}/>
+                </md-data-table-cell>
+              </md-data-table-row>
+            )
+          })}
+        </md-data-table>
       </div>
     )
   }
@@ -205,6 +235,17 @@ export default class Sales extends RecordsPage<Sale> {
         await onlineSale.delete();
       }
     }
+
+    const form = event.target as HTMLFormElement;
+    const datatable = form.querySelector<DataTable>('md-data-table');
+    const ids = datatable!.rows.filter((row)=> row.selected).map((row) => row.dataset.recordId);
+    record.setRelation('donuts', ids.map((id) => {
+      const donut = this.donuts!.find((donut) => donut.getId() === id)!;
+      const quantityName = `quantity_${donut.getId()}`;
+      donut.setPivot('quantity', event.data.get(quantityName) as unknown as number);
+      return donut;
+    }));
+    await record.save()
   }
 
   async saveRelations(record: Sale, event: FormSubmitEvent) {

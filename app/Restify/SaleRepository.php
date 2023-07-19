@@ -4,6 +4,7 @@ namespace App\Restify;
 
 use App\Models\Sale;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
+use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Fields\HasOne;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
@@ -32,6 +33,9 @@ class SaleRepository extends Repository
             BelongsTo::make('shop', ShopRepository::class),
             BelongsTo::make('supply', SupplyRepository::class),
             HasOne::make('onlineSale', OnlineSaleRepository::class),
+            BelongsToMany::make('donuts', DonutRepository::class)->withPivot(
+                field('quantity')->required()->rules('numeric')
+            ),
         ];
     }
 }
