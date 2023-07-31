@@ -174,10 +174,7 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
 
   // @ts-ignore
 
-  protected hasOne<R extends Model<any>>(relatedType: Class<R>): ToOneRelation<R, this> {
-    // @ts-ignore
-    return super.hasOne(relatedType) as ToOneRelation<R, this>;
-  }
+  protected hasOne<R extends Model<any>>(relatedType: Class<R>): ToOneRelation<R, this>
   // @ts-ignore
   protected hasOne<R extends Model<any>>(relatedType: Class<R>, relationName: string): ToOneRelation<R, this>{
     // @ts-ignore
@@ -185,11 +182,7 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
   }
 
   // @ts-ignore
-  protected hasMany<R extends Model<any>>(relatedType: Class<R>): ToManyRelation<R, this> {
-    // @ts-ignore
-    return super.hasMany(relatedType) as ToManyRelation<R, this>;
-  }
-
+  protected hasMany<R extends Model<any>>(relatedType: Class<R>)
   // @ts-ignore
   protected hasMany<R extends Model<any>>(relatedType: Class<R>, relationName: string): ToManyRelation<R, this> {
     // @ts-ignore
