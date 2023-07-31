@@ -34,6 +34,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
   openDeleteDialog: boolean = false;
   selectedRecord: M | undefined;
   isTableLoading: boolean = false;
+  isNewRecord: boolean = false;
 
   with: M['__relationsNames'] = [];
 
@@ -93,6 +94,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
     }
     this.errors = {};
     this.openDialog = true;
+    this.isNewRecord = true;
   }
 
   async deleteRecord(){
@@ -110,6 +112,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
   loadEditDialog(record: M){
     this.openDialog = true;
     this.selectedRecord = record;
+    this.isNewRecord = false;
     for(const [key, value] of Object.entries(this.formState!)){
       value(this.selectedRecord.getAttribute(key));
     }
