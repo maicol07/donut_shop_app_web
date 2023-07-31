@@ -2,7 +2,6 @@
 
 namespace App\Restify;
 
-use function assert;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Fields\Field;
 use Binaryk\LaravelRestify\Fields\FieldCollection;
@@ -22,9 +21,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Nette\Utils\Json;
+use function assert;
 use function in_array;
 use function is_array;
-use Nette\Utils\Json;
 
 abstract class Repository extends RestifyRepository
 {
@@ -154,10 +154,12 @@ abstract class Repository extends RestifyRepository
             do {
                 $original = $value;
                 $value = Arr::collapse(Arr::pluck($value, 'relationships.*.included'));
-                $value = array_filter($value);
+                $value = Arr::collapse(array_filter($value));
                 if (empty($value)) {
-                    $value = Arr::collapse(Arr::pluck($original, '*.included'));
-                    $value = array_filter($value);
+                    $value = array_filter(Arr::collapse(Arr::pluck($original, '*.included')));
+                }
+                if (isset($value['id'])) {
+                    $value = [$value];
                 }
                 $included = [...$included, ...$value];
             } while ($value);
