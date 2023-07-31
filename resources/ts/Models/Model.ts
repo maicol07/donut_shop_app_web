@@ -146,6 +146,10 @@ export default abstract class Model<A extends ModelAttributes, R extends ModelRe
     this.pivots[key] = value;
   }
 
+  removePivot<PN extends keyof P = keyof P>(key: PN) {
+    delete this.pivots[key];
+  }
+
   private serializeRelatedModel(model: Model<any, any>) {
     // @ts-expect-error - `serializeRelatedModel` is private in coloquent
     const data: {type: string, id: string, pivots?: Record<string, unknown>} = super.serializeRelatedModel(model);
