@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Donut extends Model
 {
@@ -35,5 +36,10 @@ class Donut extends Model
     {
         return $this->belongsToMany(Sale::class, 'purchases')
             ->withPivot('quantity');
+    }
+
+    final public function tariffs(): HasMany
+    {
+        return $this->hasMany(Tariff::class);
     }
 }

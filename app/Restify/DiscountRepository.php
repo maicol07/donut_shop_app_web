@@ -4,6 +4,7 @@ namespace App\Restify;
 
 use App\Models\Discount;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
+use Binaryk\LaravelRestify\Fields\HasMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class DiscountRepository extends Repository
@@ -29,6 +30,7 @@ class DiscountRepository extends Repository
                 field('created_at')->label('createdAt')->readonly(),
                 field('updated_at')->label('updatedAt')->readonly(),
             ),
+            HasMany::make('tariffs', TariffRepository::class),
         ];
     }
 }

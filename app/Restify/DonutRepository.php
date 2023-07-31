@@ -4,6 +4,7 @@ namespace App\Restify;
 
 use App\Models\Donut;
 use Binaryk\LaravelRestify\Fields\BelongsToMany;
+use Binaryk\LaravelRestify\Fields\HasMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 
 class DonutRepository extends Repository
@@ -37,6 +38,7 @@ class DonutRepository extends Repository
             BelongsToMany::make('sales', SaleRepository::class)->withPivot(
                 field('quantity')->required()->rules('numeric')
             ),
+            HasMany::make('tariffs', TariffRepository::class),
         ];
     }
 }
