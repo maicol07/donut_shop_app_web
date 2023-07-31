@@ -1,9 +1,6 @@
-import Model, {
-  ModelAttributes,
-  ModelRelations
-} from '~/Models/Model';
-import Ingredient from '~/Models/Ingredient';
+import Model, {ModelAttributes, ModelRelations} from '~/Models/Model';
 import Donut from '~/Models/Donut';
+import Tariff from '~/Models/Tariff';
 
 export interface DiscountAttributes extends ModelAttributes {
   discountName: string;
@@ -12,7 +9,8 @@ export interface DiscountAttributes extends ModelAttributes {
 }
 
 export interface DiscountRelations extends ModelRelations {
-  donuts: Donut[]
+  donuts: Donut[],
+  tariffs: Tariff[]
 }
 
 export default class Discount extends Model<DiscountAttributes, DiscountRelations> {
@@ -20,5 +18,9 @@ export default class Discount extends Model<DiscountAttributes, DiscountRelation
 
   donuts() {
     return this.hasMany(Donut);
+  }
+
+  tariffs() {
+    return this.hasMany(Tariff);
   }
 }

@@ -1,6 +1,7 @@
 import Model, {ModelAttributes, ModelPivots, ModelRelations} from '~/Models/Model';
 import Ingredient from '~/Models/Ingredient';
 import Sale from '~/Models/Sale';
+import Tariff from '~/Models/Tariff';
 
 export interface DonutAttributes extends ModelAttributes {
   name: string;
@@ -11,6 +12,7 @@ export interface DonutAttributes extends ModelAttributes {
 export interface DonutRelations extends ModelRelations {
   ingredients: Ingredient[];
   sales: Sale[];
+  tariffs: Tariff[];
 }
 
 export interface DonutPivots extends ModelPivots {
@@ -30,5 +32,9 @@ export default class Donut extends Model<DonutAttributes, DonutRelations, DonutP
 
   sales() {
     return this.hasMany(Sale);
+  }
+
+  tariffs() {
+    return this.hasMany(Tariff);
   }
 }
