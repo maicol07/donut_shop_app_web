@@ -24,7 +24,8 @@ import {OutlinedSegmentedButtonSet} from '@material/web/labs/segmentedbuttonset/
 import {SaveResponse} from 'coloquent';
 import ShopSale from '~/Models/ShopSale';
 import Donut from '~/Models/Donut';
-import {DataTable} from '@maicol07/material-web-additions/data-table/lib/data-table';
+import {TextField} from '@material/web/textfield/lib/text-field';
+import {DataTableRow, RowCheckedEventDetail} from '@maicol07/material-web-additions/data-table/lib/data-table-row';
 
 export default class Sales extends RecordsPage<Sale> {
   modelType = Sale;
@@ -42,14 +43,19 @@ export default class Sales extends RecordsPage<Sale> {
   shops: Shop[] | undefined;
   accounts: Account[] | undefined;
   donuts: Donut[] | undefined;
-  with = ['shop', 'supply', 'onlineSale', 'onlineSale.account', 'onlineSale.account.customer', 'shopSale', 'donuts'];
+  selectedDonuts: Donut[] = [];
+  with = ['shop', 'supply', 'onlineSale', 'onlineSale.account', 'onlineSale.account.customer', 'shopSale', 'donuts', 'donuts.tariffs', 'donuts.tariffs.discount'];
+  moneyFormatter = new Intl.NumberFormat('it-IT', {
+    style: 'currency',
+    currency: 'EUR'
+  });
 
   async oninit(vnode: Mithril.Vnode<PageAttributes, this>): Promise<void> {
     await super.oninit(vnode);
     await this.fetchRecords(Supply, 'supplies');
     await this.fetchRecords(Account, 'accounts');
     await this.fetchRecords(Shop, 'shops');
-    await this.fetchRecords(Donut, 'donuts');
+    await this.fetchRecords(Donut, 'donuts', ['tariffs', 'tariffs.discount']);
   }
 
   tableColumns(): Collection<Child> {
@@ -59,8 +65,18 @@ export default class Sales extends RecordsPage<Sale> {
       supply: <DataTableColumn filterable sortable>Supply</DataTableColumn>,
       type: <DataTableColumn filterable sortable>Type</DataTableColumn>,
       deliveryType: <DataTableColumn filterable sortable>Delivery type</DataTableColumn>,
-      username: <DataTableColumn filterable sortable>Username</DataTableColumn>
+      username: <DataTableColumn filterable sortable>Username</DataTableColumn>,
+      total: <DataTableColumn filterable>Total</DataTableColumn>
     })
+  }
+
+  openAddDialog() {
+    super.openAddDialog();
+    // Reset quantity pivot
+    for (const donut of (this.donuts ?? [])) {
+      donut.removePivot('quantity');
+    }
+    this.selectedDonuts = [];
   }
 
   loadEditDialog(record: Sale) {
@@ -71,6 +87,11 @@ export default class Sales extends RecordsPage<Sale> {
     this.formState.type(record.getRelation('onlineSale') ? 'online' : 'store');
     this.formState.username(record.getRelation('onlineSale')?.getRelation('account')?.getAttribute('username') ?? '');
     this.formState.deliveryType(record.getRelation('onlineSale')?.getAttribute('type') ?? '');
+    this.selectedDonuts = record.getRelation('donuts') ?? [];
+    // Reset quantity pivot
+    for (const donut of (this.donuts ?? [])) {
+      donut.removePivot('quantity');
+    }
   }
 
   attributeMap(name: keyof SaleAttributes, value: ValueOf<SaleAttributes>, record: Sale) {
@@ -89,6 +110,18 @@ export default class Sales extends RecordsPage<Sale> {
         if (!account) return '';
         const customer = account.getRelation('customer');
         return `${account.getAttribute('username')} (${customer?.getAttribute('name')} ${customer?.getAttribute('surname')})`;
+      })
+      .with("total", () => {
+        const donuts = record.getRelation('donuts');
+        if (!donuts) return '';
+        let total = 0;
+        for (const donut of donuts) {
+          const tariff = this.getDonutDiscountTariff(donut, donut.getPivot('quantity'), record.getAttribute('date'));
+          const unitPriceWithDiscount = tariff ? donut.getAttribute('price') * (1 - (tariff.getAttribute('percentageDiscount') / 100)) : donut.getAttribute('price');
+          const subtotal = unitPriceWithDiscount * donut.getPivot('quantity');
+          total += subtotal;
+        }
+        return this.moneyFormatter.format(total);
       })
       .otherwise(() => super.attributeMap(name, value, record));
   }
@@ -113,7 +146,8 @@ export default class Sales extends RecordsPage<Sale> {
             <md-outlined-segmented-button data-value="pickup" label="Shop pickup" selected={deliveryType === 'pickup'}>
               <MdIcon icon={mdiStore} slot="icon"/>
             </md-outlined-segmented-button>
-            <md-outlined-segmented-button data-value="delivery" label="Home delivery" selected={deliveryType === 'delivery'}>
+            <md-outlined-segmented-button data-value="delivery" label="Home delivery"
+                                          selected={deliveryType === 'delivery'}>
               <MdIcon icon={mdiTruckOutline} slot="icon"/>
             </md-outlined-segmented-button>
           </md-outlined-segmented-button-set>
@@ -130,6 +164,7 @@ export default class Sales extends RecordsPage<Sale> {
         </md-filled-select>
       );
     }
+    let total = 0;
 
     return (
       <div style={{display: 'flex', flexDirection: 'column', gap: '6px'}}>
@@ -165,15 +200,41 @@ export default class Sales extends RecordsPage<Sale> {
         <md-data-table>
           <md-data-table-column type="checkbox"></md-data-table-column>
           <md-data-table-column filterable sortable>Donut</md-data-table-column>
+          <md-data-table-column>Unitary price</md-data-table-column>
           <md-data-table-column>Quantity</md-data-table-column>
+          <md-data-table-column>Subtotal</md-data-table-column>
           {this.donuts?.map((donut) => {
-            const relationDonut = this.selectedRecord?.getRelation('donuts')?.find((relationDonut) => relationDonut.getId() === donut.getId());
+            const selectedDonut = this.selectedDonuts.find((selectedDonut) => selectedDonut.getId() === donut.getId());
+            if (donut.getPivot('quantity') === undefined || isNaN(donut.getPivot('quantity'))) {
+              const qty = selectedDonut?.getPivot('quantity');
+              donut.setPivot('quantity', qty ?? NaN);
+              if (this.selectedRecord && qty === undefined || this.isNewRecord) {
+                donut.setPivot('quantity', 0);
+              }
+            }
             const quantityName = `quantity_${donut.getId()}`;
+            const tariff = this.getDonutDiscountTariff(donut, donut.getPivot('quantity'), this.formState.date());
+            const unitPriceWithDiscount = tariff ? donut.getAttribute('price') * (1 - (tariff.getAttribute('percentageDiscount') / 100)) : donut.getAttribute('price');
+            const subtotal = unitPriceWithDiscount * donut.getPivot('quantity');
+
+            if (selectedDonut) {
+              total += subtotal;
+            }
             return (
-              <md-data-table-row data-relation="donuts" data-record-id={donut.getId()} selected={relationDonut !== undefined}>
+              <md-data-table-row data-relation="donuts" data-record-id={donut.getId()}
+                                 selected={selectedDonut !== undefined} onselected={this.toggleSelected.bind(this)}>
                 <md-data-table-cell type="checkbox"></md-data-table-cell>
                 <md-data-table-cell>
                   {donut.getAttribute('name')}
+                </md-data-table-cell>
+                <md-data-table-cell className="price_unit">
+                  {tariff && (
+                    <>
+                      <s>{this.moneyFormatter.format(donut.getAttribute('price'))}</s>
+                      &nbsp;
+                    </>
+                  )}
+                  {this.moneyFormatter.format(unitPriceWithDiscount)}
                 </md-data-table-cell>
                 <md-data-table-cell>
                   <md-outlined-text-field
@@ -181,14 +242,49 @@ export default class Sales extends RecordsPage<Sale> {
                     name={quantityName}
                     label="Quantity"
                     type="number"
-                    value={relationDonut?.getPivot('quantity') as unknown as string}/>
+                    min="0"
+                    value={donut.getPivot('quantity') as unknown as string}
+                    oninput={this.updateDonutPrices.bind(this, donut)}
+                  />
+                </md-data-table-cell>
+                <md-data-table-cell>
+                  {this.moneyFormatter.format(subtotal)}
                 </md-data-table-cell>
               </md-data-table-row>
             )
           })}
         </md-data-table>
+        <p style={{alignSelf: 'end', fontSize: 'medium', fontWeight: 500}}>
+          Total: {this.moneyFormatter.format(total)}
+        </p>
       </div>
     )
+  }
+
+  toggleSelected(event: CustomEvent<RowCheckedEventDetail>) {
+    const id = (event.target as DataTableRow).dataset.recordId;
+    const donut = this.donuts!.find((donut) => donut.getId() === id)!;
+    if (event.detail.selected) {
+      this.selectedDonuts.push(donut);
+    } else {
+      this.selectedDonuts.splice(this.selectedDonuts.indexOf(donut), 1);
+    }
+  }
+
+  getDonutDiscountTariff(donut: Donut, quantity: number, saleDate: string | number | Date | dayjs.Dayjs) {
+    return donut.getRelation('tariffs')?.sort((a, b) => {
+      // Sort quantity in descending order
+      return b.getAttribute('quantity') - a.getAttribute('quantity');
+    }).find((tariff) => {
+      const discount = tariff.getRelation('discount');
+      if (!discount) return false;
+      saleDate = dayjs(saleDate);
+      return tariff.getAttribute('quantity') <= quantity && saleDate.isAfter(discount.getAttribute('startDate')) && saleDate.isBefore(discount.getAttribute('endDate'));
+    });
+  }
+
+  updateDonutPrices(donut: Donut, event: Event) {
+    donut?.setPivot('quantity', (event.target as TextField).valueAsNumber);
   }
 
   segmentedButtonSetSelection(event: CustomEvent<{
@@ -242,15 +338,14 @@ export default class Sales extends RecordsPage<Sale> {
       }
     }
 
-    const form = event.target as HTMLFormElement;
-    const datatable = form.querySelector<DataTable>('md-data-table');
-    const ids = datatable!.rows.filter((row)=> row.selected).map((row) => row.dataset.recordId);
-    record.setRelation('donuts', ids.map((id) => {
-      const donut = this.donuts!.find((donut) => donut.getId() === id)!;
-      const quantityName = `quantity_${donut.getId()}`;
-      donut.setPivot('quantity', event.data.get(quantityName) as unknown as number);
-      return donut;
-    }));
+    record.setRelation('donuts', this.selectedDonuts
+      .map((donut) => {
+        const quantityName = `quantity_${donut.getId()}`;
+        donut.setPivot('quantity', event.data.get(quantityName) as unknown as number);
+        return donut;
+      })
+      .filter((donut) => donut.getPivot('quantity') > 0)
+    );
     await record.save()
   }
 
