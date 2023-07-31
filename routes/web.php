@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::inertia('/', 'Home')->name('home');
+Route::get('/', [Controller::class, 'home'])->name('home');
 Route::inertia('ingredients', 'Ingredients')->name('ingredients');
 Route::inertia('donuts', 'Donuts')->name('donuts');
 Route::inertia('companies', 'Companies')->name('companies');
