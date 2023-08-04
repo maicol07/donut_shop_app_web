@@ -1,6 +1,7 @@
-<?php
+<?php /** @noinspection UnusedFunctionResultInspection */
 
 use App\Models\Account;
+use App\Models\Company;
 use App\Models\Contract;
 use App\Models\Customer;
 use App\Models\Discount;
@@ -20,7 +21,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('accounts', static function (Blueprint $table) {
-            $table->foreign('fiscal_code')->references(app(Customer::class)->getKeyName())->on(app(Customer::class)->getTable())->cascadeOnDelete();
+            $table->foreign('fiscal_code')->references(app(Customer::class)->getKeyName())->on(app(Customer::class)->getTable())
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
         });
 
         Schema::table('availabilities', static function (Blueprint $table) {
@@ -33,6 +36,10 @@ return new class extends Migration
             $table->foreignIdFor(Ingredient::class)->change()->constrained()->cascadeOnDelete();
         });
 
+        Schema::table('customers', static function (Blueprint $table) {
+            $table->foreign('vat_number')->references(app(Company::class)->getKeyName())->on(app(Company::class)->getTable())->cascadeOnUpdate()->cascadeOnDelete();
+        });
+
         Schema::table('daily_reservations', static function (Blueprint $table) {
             $table->foreignIdFor(Donut::class)->change()->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Supply::class)->change()->constrained()->cascadeOnDelete();
@@ -40,13 +47,13 @@ return new class extends Migration
 
         Schema::table('employee_assignments', static function (Blueprint $table) {
             $table->foreignIdFor(Contract::class)->change()->constrained()->cascadeOnDelete();
-            $table->foreign('fiscal_code')->references('fiscal_code')->on(app(Employee::class)->getTable())->cascadeOnDelete();
+            $table->foreign('fiscal_code')->references('fiscal_code')->on(app(Employee::class)->getTable())->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignIdFor(Shop::class)->change()->constrained()->cascadeOnDelete();
         });
 
         Schema::table('online_sales', static function (Blueprint $table) {
             $table->foreignIdFor(Sale::class)->change()->constrained()->cascadeOnDelete();
-            $table->foreign('username')->references(app(Account::class)->getKeyName())->on(app(Account::class)->getTable())->cascadeOnDelete();
+            $table->foreign('username')->references(app(Account::class)->getKeyName())->on(app(Account::class)->getTable())->cascadeOnUpdate()->cascadeOnDelete();
         });
 
         Schema::table('purchases', static function (Blueprint $table) {
@@ -75,6 +82,10 @@ return new class extends Migration
         Schema::table('storages', static function (Blueprint $table) {
             $table->foreignIdFor(Warehouse::class)->change()->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Ingredient::class)->change()->constrained()->cascadeOnDelete();
+        });
+
+        Schema::table('supplies', static function (Blueprint $table) {
+            $table->foreign('company_vat_number')->references(app(Company::class)->getKeyName())->on(app(Company::class)->getTable())->cascadeOnUpdate()->cascadeOnDelete();
         });
 
         Schema::table('tariffs', static function (Blueprint $table) {
@@ -99,6 +110,10 @@ return new class extends Migration
             $table->dropForeign(['ingredient_id']);
         });
 
+        Schema::table('customers', static function (Blueprint $table) {
+            $table->dropForeign(['vat_number']);
+        });
+
         Schema::table('daily_reservations', static function (Blueprint $table) {
             $table->dropForeign(['donut_id']);
             $table->dropForeign(['supply_id']);
@@ -112,7 +127,7 @@ return new class extends Migration
 
         Schema::table('online_sales', static function (Blueprint $table) {
             $table->dropForeign(['sale_id']);
-            $table->dropForeign(['fiscal_code']);
+            $table->dropForeign(['username']);
         });
 
         Schema::table('purchases', static function (Blueprint $table) {
@@ -131,7 +146,6 @@ return new class extends Migration
 
         Schema::table('shop_sales', static function (Blueprint $table) {
             $table->dropForeign(['sale_id']);
-            $table->dropForeign(['shop_id']);
         });
 
         Schema::table('stocks', static function (Blueprint $table) {
@@ -145,7 +159,7 @@ return new class extends Migration
         });
 
         Schema::table('supplies', static function (Blueprint $table) {
-            $table->dropForeign(['company_id']);
+            $table->dropForeign(['company_vat_number']);
         });
 
         Schema::table('tariffs', static function (Blueprint $table) {
