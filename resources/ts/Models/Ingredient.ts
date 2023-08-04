@@ -1,8 +1,4 @@
-import Model, {
-  ModelAttributes,
-  ModelPivots,
-  ModelRelations
-} from '~/Models/Model';
+import Model, {ModelAttributes, ModelPivots, ModelRelations} from '~/Models/Model';
 
 export interface IngredientAttributes extends ModelAttributes {
   name: string;
@@ -15,6 +11,7 @@ export interface IngredientRelations extends ModelRelations {
 
 export interface IngredientPivots extends ModelPivots {
   absolute_quantity: number
+  quantity: number
 }
 
 export default class Ingredient extends Model<IngredientAttributes, IngredientRelations, IngredientPivots> {
