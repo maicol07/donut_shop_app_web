@@ -4,7 +4,7 @@ import '@maicol07/material-web-additions/data-table/data-table-column.js';
 import '@maicol07/material-web-additions/data-table/data-table-row.js';
 import '@maicol07/material-web-additions/data-table/data-table-cell.js';
 import Mithril, {Child, ChildArray, Children, Vnode} from 'mithril';
-import {Collection} from 'collect.js';
+import {collect, Collection} from 'collect.js';
 import Model, {ModelAttributes} from '~/Models/Model';
 import {Class, ValueOf} from 'type-fest';
 import {match, P} from 'ts-pattern';
@@ -19,6 +19,8 @@ import Form, {FormAttributes, FormSubmitEvent} from 'mithril-utilities/dist/Form
 import {RequestError} from 'mithril-utilities';
 import {showSnackbar} from '~/utils';
 import {SaveResponse} from 'coloquent';
+import {TextField} from '@material/web/textfield/lib/text-field';
+import {Select} from '@material/web/select/lib/select';
 
 
 export default abstract class RecordsPage<M extends Model<any, any>> extends Page {
@@ -62,29 +64,32 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
           </div>
         </div>
 
-        <md-dialog id="dialog" open={this.openDialog} style={{"--md-dialog-container-max-block-size":"82%", '--md-dialog-container-max-inline-size': '90vw'}}>
-          <span slot="header">{this.selectedRecord? "Edit":"Add"} Record</span>
+        <md-dialog id="dialog" open={this.openDialog} style={{"--md-dialog-container-max-block-size": "82%", '--md-dialog-container-max-inline-size': '90vw'}}>
+          <span slot="header">{this.selectedRecord ? "Edit" : "Add"} Record</span>
 
-          <Form id="form" state={this.formState} onsubmit={this.formSubmit.bind(this)} >
+          <Form id="form" state={this.formState} onsubmit={this.formSubmit.bind(this)}>
             {this.formContents()}
           </Form>
-          <md-text-button id="cancelButton" slot="footer" dialog-action="cancel"> Cancel </md-text-button>
-          <md-text-button id="saveButton" slot="footer" onclick={ (evt) => {this.element.querySelector<HTMLFormElement>("#form")?.requestSubmit() }}> Save </md-text-button>
+          <md-text-button id="cancelButton" slot="footer" dialog-action="cancel"> Cancel</md-text-button>
+          <md-text-button id="saveButton" slot="footer" onclick={(evt) => {
+            this.element.querySelector<HTMLFormElement>("#form")?.requestSubmit()
+          }}> Save
+          </md-text-button>
         </md-dialog>
 
         <md-dialog id="deleteDialog" open={this.openDeleteDialog}>
           <span slot="header">Confirm delete</span>
           <span>Are you sure you want to delete this Record?</span>
 
-          <md-text-button id="cancelButton" slot="footer" dialog-action="cancel"> Cancel </md-text-button>
-          <md-text-button id="deleteButton" slot="footer" onclick={this.deleteRecord.bind(this)}> Delete </md-text-button>
+          <md-text-button id="cancelButton" slot="footer" dialog-action="cancel"> Cancel</md-text-button>
+          <md-text-button id="deleteButton" slot="footer" onclick={this.deleteRecord.bind(this)}> Delete</md-text-button>
         </md-dialog>
 
       </>
     );
   }
 
-  openAddDialog(){
+  openAddDialog() {
     for (const key in this.formState) {
       if (this.formState instanceof Map) {
         this.formState.get(key)?.('')
@@ -97,11 +102,10 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
     this.isNewRecord = true;
   }
 
-  async deleteRecord(){
-    try{
+  async deleteRecord() {
+    try {
       await this.selectedRecord?.delete();
-    }
-    catch (exception){
+    } catch (exception) {
       const error = exception as RequestError;
     }
     this.openDeleteDialog = false;
@@ -109,23 +113,23 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
     await this.loadRecords();
   }
 
-  loadEditDialog(record: M){
+  loadEditDialog(record: M) {
     this.openDialog = true;
     this.selectedRecord = record;
     this.isNewRecord = false;
-    for(const [key, value] of Object.entries(this.formState!)){
+    for (const [key, value] of Object.entries(this.formState!)) {
       value(this.selectedRecord.getAttribute(key));
     }
   }
 
   oncreate(vnode: Mithril.VnodeDOM<PageAttributes, this>) {
     super.oncreate(vnode);
-    this.element.querySelector<Dialog>('#dialog')!.addEventListener( 'closed', () => {
+    this.element.querySelector<Dialog>('#dialog')!.addEventListener('closed', () => {
       this.openDialog = false;
       this.selectedRecord = undefined;
       m.redraw();
     });
-    this.element.querySelector<Dialog>('#deleteDialog')!.addEventListener( 'closed', () => {
+    this.element.querySelector<Dialog>('#deleteDialog')!.addEventListener('closed', () => {
       this.openDeleteDialog = false;
       this.selectedRecord = undefined;
       m.redraw();
@@ -148,7 +152,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
   }
 
   onRefreshRecordsButtonClicked(event: MouseEvent) {
-    (event as MouseEvent & {redraw: boolean}).redraw = false;
+    (event as MouseEvent & { redraw: boolean }).redraw = false;
     void this.loadRecords();
   }
 
@@ -179,17 +183,11 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
             </md-data-table-cell>
           )).toArray()}
 
-          {/*edit and delete buttons*/ }
+          {/*edit and delete buttons*/}
           <md-data-table-cell>
-            <md-standard-icon-button onclick={this.loadEditDialog.bind(this, record)}>
-              <MdIcon icon={mdiPencilOutline}/>
-            </md-standard-icon-button>
-            <md-standard-icon-button onclick={ (evt) => {this.openDeleteDialog = true; this.selectedRecord = record} } >
-              <MdIcon icon={mdiDeleteOutline}/>
-            </md-standard-icon-button>
+            {this.rowOptions(record).values().toArray()}
           </md-data-table-cell>
         </md-data-table-row>
-
       );
     }
 
@@ -197,6 +195,7 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
   }
 
   abstract formContents(): Children;
+
   async formSubmit(event: FormSubmitEvent) {
     const formElements = this.element.querySelectorAll<TextField | Select>('#dialog form md-filled-text-field, #dialog form md-filled-select')!;
     let valid = true;
@@ -251,7 +250,8 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
   }
 
   // @ts-ignore
-  async afterSave(record: M, response: SaveResponse<M>, event: FormSubmitEvent) {}
+  async afterSave(record: M, response: SaveResponse<M>, event: FormSubmitEvent) {
+  }
 
   abstract saveRelations(record: M, event: FormSubmitEvent): Promise<void>;
 
