@@ -194,6 +194,20 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
     return rows;
   }
 
+  rowOptions(record: M): Collection<Child> {
+    return collect({
+      edit: <md-standard-icon-button onclick={this.loadEditDialog.bind(this, record)}>
+        <MdIcon icon={mdiPencilOutline}/>
+      </md-standard-icon-button>,
+      delete: <md-standard-icon-button onclick={(evt) => {
+        this.openDeleteDialog = true;
+        this.selectedRecord = record
+        }}>
+          <MdIcon icon={mdiDeleteOutline}/>
+        </md-standard-icon-button>
+    })
+  }
+
   abstract formContents(): Children;
 
   async formSubmit(event: FormSubmitEvent) {
