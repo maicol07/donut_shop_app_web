@@ -12,6 +12,8 @@ import {FormSubmitEvent} from 'mithril-utilities/dist/Form';
 import Warehouse from '~/Models/Warehouse';
 import {SaveResponse} from 'coloquent';
 import {PageAttributes} from '~/Page';
+import Donut from '~/Models/Donut';
+import {DataTable} from '@maicol07/material-web-additions/data-table/lib/data-table';
 
 export default class Shops extends RecordsPage<Shop> {
   modelType = Shop;
@@ -19,12 +21,14 @@ export default class Shops extends RecordsPage<Shop> {
     address: Stream(''),
     warehouses: Stream('')
   }
-  warehouses: Warehouse[] | undefined
-  with = ['warehouses'];
+  warehouses: Warehouse[] | undefined;
+  donuts: Donut[] | undefined;
+  with = ['warehouses', 'donuts'];
 
   async oninit(vnode: Mithril.Vnode<PageAttributes, this>): Promise<void> {
     await super.oninit(vnode);
     await this.fetchRecords(Warehouse, 'warehouses');
+    await this.fetchRecords(Donut, 'donuts');
   }
 
   loadEditDialog(record: Shop) {
@@ -68,6 +72,34 @@ export default class Shops extends RecordsPage<Shop> {
             }
           )}
         </md-outlined-select>
+        <h3 className="headline-small">Donuts available in this shop</h3>
+        <div style={{display: 'flex', flexWrap: 'wrap', gap: '16px'}}>
+          <md-data-table>
+            <DataTableColumn filterable sortable>Donut</DataTableColumn>
+            <DataTableColumn>Quantity</DataTableColumn>
+            {this.donuts?.map((donuts) => {
+              const relationDonut = this.selectedRecord?.getRelation('donuts')?.find((relationDonut) => relationDonut.getId() === donuts.getId());
+              const quantityName = `quantity_${donuts.getId()}`;
+              return (
+                <md-data-table-row data-relation="donut" data-record-id={donuts.getId()}>
+                  <md-data-table-cell>
+                    {donuts.getAttribute('name')}
+                  </md-data-table-cell>
+                  <md-data-table-cell>
+                    <md-outlined-text-field
+                      style={{"--md-outlined-text-field-container-padding-vertical": "6px"}}
+                      name={quantityName}
+                      label="Quantity"
+                      error-text={this.errors[quantityName]?.[0]}
+                      error={quantityName in this.errors}
+                      type="number"
+                      value={relationDonut?.getPivot('quantity') as unknown as string}/>
+                  </md-data-table-cell>
+                </md-data-table-row>
+              )
+            })}
+          </md-data-table>
+        </div>
       </div>
     )
   }
@@ -81,8 +113,21 @@ export default class Shops extends RecordsPage<Shop> {
 
     if(warehouse){
       record.setRelation('warehouses', [warehouse])
-      await record.save();
     }
+
+    const form = event.target as HTMLFormElement;
+    const datatable = form.querySelector<DataTable>('md-data-table');
+    const ids = datatable!.rows.map((row) => row.dataset.recordId)
+
+    record.setRelation('donuts', ids.map((id) => {
+      const donut = this.donuts?.find((ingredient) => ingredient.getId() === id)!;
+      const absoluteQuantityName = `quantity_${donut.getId()}`;
+      const absoluteQuantity = form.querySelector<HTMLInputElement>(`[name="${absoluteQuantityName}"]`)!.value as unknown as number;
+      donut.setPivot('quantity', absoluteQuantity);
+      return donut;
+    }).filter((donut) => donut.getPivot('quantity') > 0));
+
+    await record.save();
 
     await super.afterSave(record, response, event);
   }

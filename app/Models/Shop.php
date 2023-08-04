@@ -24,7 +24,7 @@ class Shop extends Model
     }
 
     // Availabilities
-    final public function availabilities(): BelongsToMany
+    final public function donuts(): BelongsToMany
     {
         return $this->belongsToMany(Donut::class, 'availabilities')->withPivot(['quantity'])->withTimestamps();
     }

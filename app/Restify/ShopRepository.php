@@ -33,10 +33,8 @@ class ShopRepository extends Repository
                 field('created_at')->label('createdAt')->readonly(),
                 field('updated_at')->label('updatedAt')->readonly(),
             ),
-            BelongsToMany::make('availabilities', DonutRepository::class)->withPivot(
+            BelongsToMany::make('donuts', DonutRepository::class)->withPivot(
                 field('quantity')->required()->rules('numeric'),
-                field('created_at')->label('createdAt')->readonly(),
-                field('updated_at')->label('updatedAt')->readonly(),
             ),
             BelongsToMany::make('warehouses', WarehouseRepository::class),
         ];

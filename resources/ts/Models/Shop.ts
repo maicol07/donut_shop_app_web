@@ -1,8 +1,4 @@
-import Model, {
-  ModelAttributes,
-  ModelRelations
-} from '~/Models/Model';
-import Account from '~/Models/Account';
+import Model, {ModelAttributes, ModelRelations} from '~/Models/Model';
 import Employee from '~/Models/Employee';
 import Contract from '~/Models/Contract';
 import Donut from '~/Models/Donut';
@@ -15,7 +11,7 @@ export interface ShopAttributes extends ModelAttributes {
 export interface ShopRelations extends ModelRelations {
   employees: Employee[],
   contracts: Contract[],
-  availabilities: Donut[],
+  donuts: Donut[],
   warehouses: Warehouse[]
 }
 
@@ -30,7 +26,7 @@ export default class Shop extends Model<ShopAttributes, ShopRelations> {
     return this.hasMany(Contract);
   }
 
-  availabilities(){
+  donuts(){
     return this.hasMany(Donut);
   }
 
