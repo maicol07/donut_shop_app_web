@@ -22,4 +22,4 @@
 
 Nel caso in cui si voglia utilizzare l'applicazione in produzione, è consigliato non utilizzare i server di sviluppo in locale, ma bensì un proprio server web (Apache, Nginx, etc.) e un database MySQL.
 Il webserver deve puntare alla cartella `public` del progetto, mentre il database deve essere configurato nel file `.env` (seguendo il formato di `.env.example`).
-Inooltre, è necessario compilare le risorse JavaScript e CSS con il comando `pnpm run build`.
+Inoltre, è necessario compilare le risorse JavaScript e CSS con il comando `pnpm run build`.
