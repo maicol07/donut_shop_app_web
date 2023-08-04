@@ -63,7 +63,7 @@ export default class Donuts extends RecordsPage<Donut> {
     return (
       <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
         <md-filled-text-field name="name" label="Name" error-text={this.errors.name?.[0]} error={'name' in this.errors}/>
-        <md-filled-text-field name="price" type="number" suffix-text="€" label="Price" error-text={this.errors.price?.[0]} error={'price' in this.errors}/>
+        <md-filled-text-field name="price" type="number" suffix-text="€" min="0" step="0.01" label="Price" error-text={this.errors.price?.[0]} error={'price' in this.errors}/>
         <md-filled-text-field name="description" label="Description" error-text={this.errors.description?.[0]} error={'description' in this.errors}/>
         <h3 className="headline-small">Ingredients</h3>
         <div style={{display: 'flex', flexWrap: 'wrap', gap: '16px'}}>
