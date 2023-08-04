@@ -66,9 +66,27 @@ class ContractRepository extends Repository
                 'shop_id' => $shop_id,
                 'fiscal_code' => $employee_fiscal_code,
             ])->delete();
+            return data([], 201);
         }
 
-        return data([], 201);
+        $errors = [];
+        if (!$shop_id) {
+            $errors['shop'] = [
+                'The shop field is required.'
+            ];
+        }
+
+        if (!$employee_fiscal_code) {
+            $errors['fiscalCode'] = [
+                'The employee_fiscalCode field is required.'
+            ];
+        }
+
+        return response()->json([
+            'response' => compact('errors')
+        ], 500);
+
+
     }
 
     private function getEmployeeShopFromRequest(RestifyRequest $request): array

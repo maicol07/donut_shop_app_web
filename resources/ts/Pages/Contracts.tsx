@@ -21,6 +21,8 @@ import dayjs from 'dayjs';
 import {mdiDeleteOutline, mdiPlus} from '@mdi/js';
 import MdIcon from '~/Components/MdIcon';
 import customParseFormat from 'dayjs/esm/plugin/customParseFormat'
+import {RequestError} from 'mithril-utilities';
+import {showSnackbar} from '~/utils';
 
 
 export default class Contracts extends RecordsPage<Contract> {
@@ -78,7 +80,7 @@ export default class Contracts extends RecordsPage<Contract> {
   formContents(): Mithril.Children {
     return (
       <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-        <md-filled-select name="fiscalCode" label="Employee">
+        <md-filled-select name="fiscalCode" label="Employee" required error-text={this.errors.fiscalCode?.[0]} error={'fiscalCode' in this.errors}>
           {this.employees?.map((employee) => {
               return (
                 <md-select-option value={employee.getAttribute('fiscalCode')}
@@ -89,14 +91,14 @@ export default class Contracts extends RecordsPage<Contract> {
           )}
         </md-filled-select>
         <md-filled-text-field name="salary" label="salary" type="number" error-text={this.errors.salary?.[0]}
-                              error={'salary' in this.errors}/>
+                              error={'salary' in this.errors} min="0" suffix-text="€"/>
         <md-filled-text-field name="startDate" type="date" label="Start Date" error-text={this.errors.startDate?.[0]}
                               error={'startDate' in this.errors}/>
         <md-filled-text-field name="endDate" type="date" label="End Date" error-text={this.errors.endDate?.[0]}
                               error={'endDate' in this.errors}/>
         <md-filled-text-field name="type" label="Type" error-text={this.errors.type?.[0]}
                               error={'type' in this.errors}/>
-        <md-filled-select name="shop" label="Shop">
+        <md-filled-select name="shop" label="Shop" required error-text={this.errors.shop?.[0]} error={'shop' in this.errors}>
           {this.shops?.map((shop) => {
               return (
                 <md-select-option value={shop.getId()} headline={shop.getAttribute('address')}
@@ -190,12 +192,24 @@ export default class Contracts extends RecordsPage<Contract> {
     record.setRelation('shops', shop ? [shop] : [])
     record.setRelation('employee', employee ? [employee] : []);
 
-    await record.save()
+    try {
+      await record.save()
 
-    //add relation to shifts
-    for (const shift of this.shifts) {
-      shift.setRelation('contract', record);
-      await shift.save()
+      //add relation to shifts
+      for (const shift of this.shifts) {
+        shift.setRelation('contract', record);
+        await shift.save()
+      }
+    } catch (exception) {
+      const error = exception as RequestError<{ "message": string, "errors": Record<string, string[]> }>;
+      if (error.response === undefined) { // Not a request error
+        throw exception;
+      }
+      this.errors = error.response.errors ?? {};
+      m.redraw();
+      void showSnackbar(error.response.message);
+      // Delete contract if it was created and something went wrong
+      await record.delete();
     }
     await super.afterSave(record, response, event);
   }

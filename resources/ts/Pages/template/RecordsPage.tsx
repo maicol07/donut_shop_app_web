@@ -198,6 +198,23 @@ export default abstract class RecordsPage<M extends Model<any, any>> extends Pag
 
   abstract formContents(): Children;
   async formSubmit(event: FormSubmitEvent) {
+    const formElements = this.element.querySelectorAll<TextField | Select>('#dialog form md-filled-text-field, #dialog form md-filled-select')!;
+    let valid = true;
+    for (const element of formElements) {
+      if (element instanceof TextField && !element.reportValidity()) {
+        valid = false;
+      }
+
+      if (element instanceof Select && element.required && element.value === '') {
+        valid = false;
+        element.error = true;
+        element.errorText = 'This field is required';
+      }
+    }
+    if (!valid) {
+      void showSnackbar("There are errors in the form!");
+      return;
+    }
     // @ts-expect-error — this is a hack to get around that the type of the model is not known at compile time
     let record = this.selectedRecord ?? new this.modelType();
 
