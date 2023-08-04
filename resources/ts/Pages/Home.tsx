@@ -35,7 +35,7 @@ export default class Home extends Page<HomeAttributes> {
           <>
             <h1 className="display-large">Home</h1>
             <md-layout-grid style={{textAlign: 'center', '--md-card-padding': '16px'}}>
-              <md-filled-card>
+              <md-filled-card grid-span="3">
                 <div>
                   <MdIcon icon={mdiCashMultiple} style="--_icon-size: 36px;"/>
                   <h2 className="headline-small">Shop sales proceeds</h2>
@@ -44,7 +44,7 @@ export default class Home extends Page<HomeAttributes> {
                   {this.moneyFormatter.format(vnode.attrs.page.props.salesProceeds.inShop)}
                 </span>
               </md-filled-card>
-              <md-filled-card>
+              <md-filled-card grid-span="3">
                 <div>
                   <MdIcon icon={mdiCashMultiple} style="--_icon-size: 36px;"/>
                   <h2 className="headline-small">Online sales proceeds</h2>
@@ -53,7 +53,7 @@ export default class Home extends Page<HomeAttributes> {
                   {this.moneyFormatter.format(vnode.attrs.page.props.salesProceeds.online)}
                 </span>
               </md-filled-card>
-              <md-filled-card>
+              <md-filled-card grid-span="3">
                 <div>
                   <MdIcon icon={mdiTrophyOutline} style="--_icon-size: 36px;"/>
                   <h2 className="headline-small">Best Selling Donuts</h2>
@@ -66,9 +66,8 @@ export default class Home extends Page<HomeAttributes> {
                     )
                   }
                 </md-list>
-
               </md-filled-card>
-              <md-filled-card>
+              <md-filled-card grid-span="3">
                 <div>
                   <MdIcon icon={mdiShoppingOutline} style="--_icon-size: 36px;"/>
                   <h2 className="headline-small">Shop Proceeds</h2>
