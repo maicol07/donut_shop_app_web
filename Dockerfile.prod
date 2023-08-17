@@ -1,0 +1,40 @@
+# syntax = edrevo/dockerfile-plus
+# Dockerfile for production environment
+FROM litespeedtech/openlitespeed:1.7.18-lsphp81
+INCLUDE+ Dockerfile.common
+
+ARG MYSQL_HOST
+ARG MYSQL_USER
+ARG MYSQL_PASSWORD
+ARG MYSQL_DATABASE
+ARG MYSQL_PORT
+
+ENV MYSQL_HOST=${MYSQL_HOST}
+ENV MYSQL_USER=${MYSQL_USER}
+ENV MYSQL_PASSWORD=${MYSQL_PASSWORD}
+ENV MYSQL_DATABASE=${MYSQL_DATABASE}
+ENV MYSQL_PORT=${MYSQL_PORT}
+
+# Copy the website to the webserver root
+COPY . /var/www/vhosts/localhost/html
+COPY ./ols.conf /usr/local/lsws/conf/templates/docker.conf
+
+# Install website dependencies
+WORKDIR /var/www/vhosts/localhost/html
+RUN chown -R nobody:nogroup /var/www/vhosts/localhost/html/
+RUN composer install --no-dev --optimize-autoloader
+RUN php -r "file_exists('.env') || copy('.env.example', '.env');"
+RUN php artisan key:generate --ansi
+
+# Install and compile frontend assets
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - &&\
+    apt-get install -y nodejs
+RUN npm install -g pnpm
+RUN pnpm install
+RUN pnpm build
+
+# Imposta le variabili d'ambiente
+ADD https://raw.githubusercontent.com/bashup/dotenv/master/dotenv /usr/local/bin/dotenv
+RUN chmod +x /usr/local/bin/dotenv
+
+INCLUDE+ Dockerfile.entrypoint

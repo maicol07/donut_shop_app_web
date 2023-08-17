@@ -1,0 +1,37 @@
+ARG PHP_VERSION=8.1
+ENV PHP_VERSION=${PHP_VERSION}
+
+RUN apt-get update
+
+# Package managers
+RUN apt-get install -y software-properties-common
+
+RUN add-apt-repository --yes ppa:fish-shell/release-3 \
+    && add-apt-repository --yes ppa:ondrej/php
+# Install packages
+RUN apt-get install -y \
+    curl \
+    unzip \
+    git \
+    fish \
+    micro \
+    nano \
+  php${PHP_VERSION}-cli \
+  php${PHP_VERSION}-common \
+  php${PHP_VERSION}-curl \
+  php${PHP_VERSION}-gd \
+  php${PHP_VERSION}-mbstring \
+  php${PHP_VERSION}-mysql \
+  php${PHP_VERSION}-pdo \
+  php${PHP_VERSION}-opcache \
+  php${PHP_VERSION}-xml \
+  php${PHP_VERSION}-zip
+
+RUN chsh -s /usr/bin/fish
+ENV SHELL /usr/bin/fish
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Add composer bin to PATH
+ENV PATH="/root/.composer/vendor/bin:${PATH}"

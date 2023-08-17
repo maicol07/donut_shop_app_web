@@ -1,0 +1,6 @@
+# Esegue eventuali script di avvio o di configurazione necessari
+ADD https://raw.githubusercontent.com/litespeedtech/ols-dockerfiles/master/template/entrypoint.sh /ols-entrypoint.sh
+RUN chmod +x /ols-entrypoint.sh
+COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]

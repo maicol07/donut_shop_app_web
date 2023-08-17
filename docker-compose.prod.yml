@@ -1,0 +1,26 @@
+version: '3.8'
+
+volumes:
+  mysql:
+
+services:
+  mysql:
+    extends:
+      service: mysql
+      file: docker-compose.shared.yml
+    volumes:
+      - mysql:/var/lib/mysql
+  phpmyadmin:
+    extends:
+      service: phpmyadmin
+      file: docker-compose.shared.yml
+    depends_on:
+      - mysql
+  app:
+    extends:
+      service: app
+      file: docker-compose.shared.yml
+    build:
+      dockerfile: Dockerfile.prod
+    depends_on:
+      - mysql

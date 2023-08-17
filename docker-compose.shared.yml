@@ -1,0 +1,38 @@
+services:
+  mysql:
+    image: mariadb:10
+    environment:
+      MARIADB_DATABASE: donutshopapp
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 'true'
+    restart: unless-stopped
+    ports:
+      - "3336:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+  phpmyadmin:
+    image: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: ''
+      UPLOAD_LIMIT: 1G
+      MEMORY_LIMIT: 1G
+    restart: unless-stopped
+    ports:
+      - "8088:80"
+  app:
+    build:
+      context: .
+    environment:
+      TZ: Europe/Rome
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ''
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: donutshopapp
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+      - "443:443"
+      - "443:443/udp"
+      - "7080:7080"
