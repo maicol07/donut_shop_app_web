@@ -7,6 +7,10 @@ export default defineConfig({
             '~': '/resources/ts'
         }
     },
+    build: {
+        target: 'esnext',
+        minify: false,
+    },
     plugins: [
         laravel({
             input: ['resources/ts/app.ts'],
