@@ -21,6 +21,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('accounts', static function (Blueprint $table) {
+            $table->dropForeign(['fiscal_code']);
             $table->foreign('fiscal_code')->references(app(Customer::class)->getKeyName())->on(app(Customer::class)->getTable())
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
@@ -37,6 +38,7 @@ return new class extends Migration
         });
 
         Schema::table('customers', static function (Blueprint $table) {
+            $table->dropForeign(['vat_number']);
             $table->foreign('vat_number')->references(app(Company::class)->getKeyName())->on(app(Company::class)->getTable())->cascadeOnUpdate()->cascadeOnDelete();
         });
 
@@ -47,12 +49,14 @@ return new class extends Migration
 
         Schema::table('employee_assignments', static function (Blueprint $table) {
             $table->foreignIdFor(Contract::class)->change()->constrained()->cascadeOnDelete();
+            $table->dropForeign(['fiscal_code']);
             $table->foreign('fiscal_code')->references('fiscal_code')->on(app(Employee::class)->getTable())->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignIdFor(Shop::class)->change()->constrained()->cascadeOnDelete();
         });
 
         Schema::table('online_sales', static function (Blueprint $table) {
             $table->foreignIdFor(Sale::class)->change()->constrained()->cascadeOnDelete();
+            $table->dropForeign(['username']);
             $table->foreign('username')->references(app(Account::class)->getKeyName())->on(app(Account::class)->getTable())->cascadeOnUpdate()->cascadeOnDelete();
         });
 
@@ -85,6 +89,7 @@ return new class extends Migration
         });
 
         Schema::table('supplies', static function (Blueprint $table) {
+            $table->dropForeign(['company_vat_number']);
             $table->foreign('company_vat_number')->references(app(Company::class)->getKeyName())->on(app(Company::class)->getTable())->cascadeOnUpdate()->cascadeOnDelete();
         });
 
