@@ -13,13 +13,11 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
      * This gate determines who can access Restify in non-local environments.
      *
      * @return void
+     * @noinspection PhpUnusedParameterInspection
      */
     protected function gate(): void
     {
-        Gate::define('viewRestify', function ($user) {
-//            return in_array($user->email, [
-//                //
-//            ]);
+        Gate::define('viewRestify', static function ($user = null) {
             return true;
         });
     }
