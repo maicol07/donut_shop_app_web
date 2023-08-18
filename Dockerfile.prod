@@ -3,18 +3,6 @@
 FROM litespeedtech/openlitespeed:1.7.18-lsphp81
 INCLUDE+ Dockerfile.common
 
-ARG MYSQL_HOST
-ARG MYSQL_USER
-ARG MYSQL_PASSWORD
-ARG MYSQL_DATABASE
-ARG MYSQL_PORT
-
-ENV MYSQL_HOST=${MYSQL_HOST}
-ENV MYSQL_USER=${MYSQL_USER}
-ENV MYSQL_PASSWORD=${MYSQL_PASSWORD}
-ENV MYSQL_DATABASE=${MYSQL_DATABASE}
-ENV MYSQL_PORT=${MYSQL_PORT}
-
 # Copy the website to the webserver root
 COPY . /var/www/vhosts/localhost/html
 COPY ./ols.conf /usr/local/lsws/conf/templates/docker.conf
