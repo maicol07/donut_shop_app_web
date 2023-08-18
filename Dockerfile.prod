@@ -33,8 +33,6 @@ RUN npm install -g pnpm
 RUN pnpm install
 RUN pnpm build
 
-# Imposta le variabili d'ambiente
-ADD https://raw.githubusercontent.com/bashup/dotenv/master/dotenv /usr/local/bin/dotenv
-RUN chmod +x /usr/local/bin/dotenv
+RUN dotenv set APP_ENV=prod APP_DEBUG=false
 
 INCLUDE+ Dockerfile.entrypoint
